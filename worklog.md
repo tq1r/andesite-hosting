@@ -82,3 +82,25 @@ Stage Summary:
 - Fully working Minecraft hosting panel with live simulated servers (socket.io engine + Prisma REST + Next.js 16 SPA on /)
 - Demo state: "Blockhaven SMP" (Paper 1.21.4, online w/ simulated players) + "Emerald Isle" (Fabric, offline) — user can start/stop, run commands, manage everything
 - Engine: mini-services/mc-engine (bun --hot), internal API :3004; dev server :3000 via gateway :81
+
+---
+Task ID: 5
+Agent: main (Super Z)
+Task: Rebrand CraftHost → "Andesite Hosting" with andesite-vibe redesign; make repo GitHub+Vercel ready; push to GitHub; deploy to Vercel
+
+Work Log:
+- Brand: new AndesiteMark component (8×8 chiseled stone "A" with molten ember crossbar on salt-and-pepper andesite grain) replacing CreeperMark; generated matching src/app/icon.svg favicon + public/logo.svg via scripts/gen-brand-assets.mjs (bun run brand:assets); metadata retitled "Andesite Hosting — Minecraft Server Hosting"
+- Theme (globals.css): warm stone grays (oklch hue 80) + ember-copper primary (oklch 0.705 0.155 50), warm chart palette, ember selection, .font-display (Space Grotesk via next/font, replaced Press Start 2P), .bg-stone-grid + .bg-stone-grain (feTurbulence) textures replaced .bg-pixel-grid
+- Copy: Landing rewritten in andesite voice ("Your Minecraft server. Set in stone in 60 seconds.", "Ready to carve out your world?", FloatingShards in andesite grays+ember); PLANS renamed Dirt/Iron/Diamond/Netherite → Andesite/Diorite/Granite/Obsidian; play.andesite.host + sftp.andesite.host domains; [Andesite] console prefix; MOTD default "An Andesite server"
+- Color sweep (13 files): emerald→orange brand accents, zinc→stone, font-pixel→font-display; semantic greens intentionally kept (online status dots/badges, RAM-health bar, CHAT log color, PlayersTab online chips, OP badges, Panel healthy dot)
+- Vercel readiness: package.json → name andesite-hosting, postinstall "prisma generate", build = plain next build (standalone moved to build:standalone), engine + brand:assets scripts; next.config → output standalone only when not VERCEL, outputFileTracingIncludes bundles db/custom.db into /api routes; lib/db.ts → on VERCEL copies bundled SQLite snapshot to /tmp/andesite.db per instance; lib/socket.ts → NEXT_PUBLIC_ENGINE_URL override ('disabled' supported); use-server-socket → onEngineChange handler; ConsoleTab → amber "engine offline" chip + static-deployment empty state
+- README.md: architecture diagram, local dev, engine, Vercel deploy section + button, env vars, brand regeneration, stack
+- Cleanup: untracked QA screenshots/analysis JSONs from git, extended .gitignore (scripts/*.png, *analysis*.json, search-*.json, engine.log)
+- Fixed ops: killed duplicate mc-engine processes (bun --hot leftovers; boot timers stuck in "starting" — killed by port PIDs, restarted single clean engine, 3 schedules bootstrapped)
+- Verified: lint clean; production build passes (all /api routes dynamic ƒ, / + /icon.svg static); agent-browser E2E: landing (Andesite brand, stone+ember palette, stone-family pricing w/ orange Most popular on Granite, zero green leftovers), panel dashboard, Blockhaven boot → online → `list` (1/30 online) + `say [Andesite] brand check` round-trip on live console; tabs click-through with zero page errors; favicon 200; VLM audits of landing/panel/console/stats all pass
+- Committed as 8ea0ac6 "Rebrand to Andesite Hosting — carved-from-stone theme"
+- Infra for publish: gh CLI 2.76.2 installed at ~/bin (GitHub API rate-limited on shared IP → pinned-version tarball); vercel CLI installed at ~/.npm-global/bin/vercel; gh device-flow login started (code surfaced to user)
+
+Stage Summary:
+- App fully rebranded to Andesite Hosting with cohesive stone+ember design system; verified locally end-to-end
+- Repo is GitHub/Vercel ready (build ✅); awaiting user GitHub device authorization (code E36E-4726) → next: create repo, push, fix README deploy URL to real owner, deploy via Vercel CLI or import button
