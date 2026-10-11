@@ -51,29 +51,29 @@ export function ServerView({ server }: { server: ServerDTO }) {
     <motion.div key={server.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="p-4 md:p-6 max-w-6xl mx-auto">
       {/* ── Header ── */}
       <div className="flex flex-wrap items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={closeServer} className="text-zinc-400 hover:text-zinc-100" aria-label="Back to dashboard">
+        <Button variant="ghost" size="icon" onClick={closeServer} className="text-stone-400 hover:text-stone-100" aria-label="Back to dashboard">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-lg font-semibold text-zinc-100 truncate">{server.name}</h1>
+            <h1 className="text-lg font-semibold text-stone-100 truncate">{server.name}</h1>
             <Badge variant="outline" className={`flex items-center gap-1.5 ${meta.badge}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
               {meta.label}
             </Badge>
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
             <span>{platformLabel(server.platform)} {server.version}</span>
-            <span className="text-zinc-700">·</span>
+            <span className="text-stone-700">·</span>
             <span>{ramLabel(server.ramMb)} RAM</span>
-            <span className="text-zinc-700">·</span>
+            <span className="text-stone-700">·</span>
             <span>uptime {uptimeLabel(server.uptimeSec)}</span>
           </div>
         </div>
 
         <button
           onClick={copyAddress}
-          className="flex items-center gap-1.5 rounded-md border border-white/10 bg-black/30 px-2.5 py-1.5 font-mono text-xs text-zinc-400 hover:text-emerald-300 hover:border-emerald-500/30 transition-colors"
+          className="flex items-center gap-1.5 rounded-md border border-white/10 bg-black/30 px-2.5 py-1.5 font-mono text-xs text-stone-400 hover:text-orange-300 hover:border-orange-500/30 transition-colors"
           aria-label={`Copy address ${serverAddress(server)}`}
         >
           {serverAddress(server)}
@@ -88,7 +88,7 @@ export function ServerView({ server }: { server: ServerDTO }) {
                 size="sm"
                 disabled={server.status !== 'offline'}
                 onClick={() => onPower('start')}
-                className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold"
+                className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold"
               >
                 <Play className="mr-1 h-3.5 w-3.5" /> Start
               </Button>
@@ -125,40 +125,40 @@ export function ServerView({ server }: { server: ServerDTO }) {
       {/* ── Tabs ── */}
       <Tabs value={tab} onValueChange={setTab} className="mt-6">
         <TabsList className="bg-white/[0.03] border border-white/5 h-auto p-1 flex flex-wrap gap-1">
-          <TabsTrigger value="console" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="console" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <TerminalSquare className="h-4 w-4" /> Console
           </TabsTrigger>
-          <TabsTrigger value="stats" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="stats" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <Activity className="h-4 w-4" /> Stats
           </TabsTrigger>
-          <TabsTrigger value="players" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="players" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <Users className="h-4 w-4" /> Players
             {server.playersOnline > 0 && (
-              <span className="ml-0.5 rounded-full bg-emerald-500/20 text-emerald-300 px-1.5 text-[10px] font-mono">
+              <span className="ml-0.5 rounded-full bg-orange-500/20 text-orange-300 px-1.5 text-[10px] font-mono">
                 {server.playersOnline}
               </span>
             )}
           </TabsTrigger>
           {server.platform !== 'vanilla' && (
-            <TabsTrigger value="plugins" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+            <TabsTrigger value="plugins" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
               <Puzzle className="h-4 w-4" /> {server.platform === 'fabric' || server.platform === 'forge' ? 'Mods' : 'Plugins'}
               {server.plugins?.length > 0 && (
-                <span className="ml-0.5 rounded-full bg-emerald-500/20 text-emerald-300 px-1.5 text-[10px] font-mono">
+                <span className="ml-0.5 rounded-full bg-orange-500/20 text-orange-300 px-1.5 text-[10px] font-mono">
                   {server.plugins.length}
                 </span>
               )}
             </TabsTrigger>
           )}
-          <TabsTrigger value="schedules" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="schedules" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <CalendarClock className="h-4 w-4" /> Schedules
           </TabsTrigger>
-          <TabsTrigger value="files" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="files" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <FolderCog className="h-4 w-4" /> Files
           </TabsTrigger>
-          <TabsTrigger value="backups" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="backups" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <HardDriveDownload className="h-4 w-4" /> Backups
           </TabsTrigger>
-          <TabsTrigger value="settings" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+          <TabsTrigger value="settings" className="data-[state=active]:bg-orange-500/15 data-[state=active]:text-orange-300 gap-1.5">
             <Settings2 className="h-4 w-4" /> Settings
           </TabsTrigger>
         </TabsList>

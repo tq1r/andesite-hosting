@@ -1,4 +1,4 @@
-// ─── CraftHost shared constants & types (client-safe) ────────────────────────
+// ─── Andesite shared constants & types (client-safe) ────────────────────────
 
 export type ServerStatus = 'offline' | 'starting' | 'online' | 'stopping'
 export type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'CHAT' | 'CMD'
@@ -201,8 +201,8 @@ export const WORLD_TYPES = [
 
 export const PLANS = [
   {
-    id: 'dirt',
-    name: 'Dirt',
+    id: 'andesite',
+    name: 'Andesite',
     ramMb: 2048,
     price: 0,
     priceLabel: 'Free',
@@ -213,8 +213,8 @@ export const PLANS = [
     highlight: false,
   },
   {
-    id: 'iron',
-    name: 'Iron',
+    id: 'diorite',
+    name: 'Diorite',
     ramMb: 4096,
     price: 3.49,
     priceLabel: '$3.49',
@@ -225,8 +225,8 @@ export const PLANS = [
     highlight: false,
   },
   {
-    id: 'diamond',
-    name: 'Diamond',
+    id: 'granite',
+    name: 'Granite',
     ramMb: 8192,
     price: 6.99,
     priceLabel: '$6.99',
@@ -237,8 +237,8 @@ export const PLANS = [
     highlight: true,
   },
   {
-    id: 'netherite',
-    name: 'Netherite',
+    id: 'obsidian',
+    name: 'Obsidian',
     ramMb: 16384,
     price: 12.99,
     priceLabel: '$12.99',
@@ -418,7 +418,7 @@ export const STATUS_META: Record<ServerStatus, { label: string; dot: string; bad
 }
 
 export function serverAddress(s: { port: number }): string {
-  return `play.crafthost.gg:${s.port}`
+  return `play.andesite.host:${s.port}`
 }
 
 export function platformLabel(id: string): string {

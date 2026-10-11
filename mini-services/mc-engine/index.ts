@@ -1,4 +1,4 @@
-// CraftHost engine — socket.io (3003) + internal HTTP API (3004, for Next.js only)
+// Andesite engine — socket.io (3003) + internal HTTP API (3004, for Next.js only)
 import { createServer, type IncomingMessage, type ServerResponse } from 'http'
 import { Server, type Socket } from 'socket.io'
 import { SimEngine, type EngineSchedule, type RuntimeConfig, type StatsSample } from './sim'

@@ -49,15 +49,15 @@ export function ServerCard({ server }: { server: ServerDTO }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="bg-white/[0.02] border-white/5 hover:border-emerald-500/25 transition-colors h-full flex flex-col">
+      <Card className="bg-white/[0.02] border-white/5 hover:border-orange-500/25 transition-colors h-full flex flex-col">
         <CardContent className="p-4 flex flex-col flex-1 gap-3">
           {/* header */}
           <div className="flex items-start justify-between gap-2">
             <button onClick={() => openServer(server.id)} className="min-w-0 text-left group">
-              <h3 className="font-semibold text-zinc-100 truncate group-hover:text-emerald-300 transition-colors">
+              <h3 className="font-semibold text-stone-100 truncate group-hover:text-orange-300 transition-colors">
                 {server.name}
               </h3>
-              <p className="mt-0.5 text-xs text-zinc-500">
+              <p className="mt-0.5 text-xs text-stone-500">
                 {platformLabel(server.platform)} {server.version} · {server.region}
               </p>
             </button>
@@ -70,7 +70,7 @@ export function ServerCard({ server }: { server: ServerDTO }) {
           {/* address */}
           <button
             onClick={copyAddress}
-            className="flex items-center gap-1.5 rounded-md border border-white/5 bg-black/30 px-2.5 py-1.5 font-mono text-xs text-zinc-400 hover:text-emerald-300 hover:border-emerald-500/30 transition-colors w-fit"
+            className="flex items-center gap-1.5 rounded-md border border-white/5 bg-black/30 px-2.5 py-1.5 font-mono text-xs text-stone-400 hover:text-orange-300 hover:border-orange-500/30 transition-colors w-fit"
             aria-label={`Copy address ${serverAddress(server)}`}
           >
             {serverAddress(server)}
@@ -80,11 +80,11 @@ export function ServerCard({ server }: { server: ServerDTO }) {
           {/* bars */}
           <div className="space-y-2">
             <div>
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 mb-1">
+              <div className="flex items-center justify-between text-[11px] text-stone-500 mb-1">
                 <span className="flex items-center gap-1"><Users className="h-3 w-3" /> Players</span>
                 <span className="font-mono">{server.playersOnline} / {server.maxPlayers}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-stone-800 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${ramPct > 80 ? 'bg-red-400' : 'bg-emerald-400'}`}
                   style={{ width: `${ramPct}%` }}
@@ -92,12 +92,12 @@ export function ServerCard({ server }: { server: ServerDTO }) {
               </div>
             </div>
             <div>
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 mb-1">
+              <div className="flex items-center justify-between text-[11px] text-stone-500 mb-1">
                 <span className="flex items-center gap-1"><Cpu className="h-3 w-3" /> RAM</span>
                 <span className="font-mono">{ramLabel(server.ramMb)}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-                <div className="h-full w-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400" />
+              <div className="h-1.5 rounded-full bg-stone-800 overflow-hidden">
+                <div className="h-full w-full rounded-full bg-gradient-to-r from-orange-600 to-orange-400" />
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ export function ServerCard({ server }: { server: ServerDTO }) {
                 </TooltipTrigger><TooltipContent>Stop</TooltipContent></Tooltip>
               </>
             ) : server.status === 'offline' ? (
-              <Button size="sm" disabled={busy} onClick={() => onPower('start')} className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold flex-1">
+              <Button size="sm" disabled={busy} onClick={() => onPower('start')} className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold flex-1">
                 <Play className="mr-1.5 h-3.5 w-3.5" /> Start
               </Button>
             ) : (
@@ -126,7 +126,7 @@ export function ServerCard({ server }: { server: ServerDTO }) {
                 <span className={`h-2 w-2 rounded-full ${meta.dot} mr-1.5`} /> {meta.label}…
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => openServer(server.id)} className="ml-auto border-white/10 hover:bg-white/5 hover:text-emerald-300">
+            <Button size="sm" variant="outline" onClick={() => openServer(server.id)} className="ml-auto border-white/10 hover:bg-white/5 hover:text-orange-300">
               <Settings2 className="mr-1.5 h-3.5 w-3.5" /> Manage
             </Button>
           </div>

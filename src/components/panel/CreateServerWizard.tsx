@@ -41,7 +41,7 @@ export function CreateServerWizard() {
 
   return (
     <Dialog open={wizardOpen} onOpenChange={(o) => !o && closeWizard()}>
-      <DialogContent className="max-w-lg bg-zinc-950 border-white/10 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg bg-stone-950 border-white/10 max-h-[90vh] overflow-y-auto">
         {/* key → fresh state every time the wizard opens */}
         <WizardBody key={wizardSession} prefillRamMb={wizardRamMb} />
       </DialogContent>
@@ -97,7 +97,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
         name: name.trim(),
         platform,
         version,
-        motd: motd.trim() || 'A CraftHost Server',
+        motd: motd.trim() || 'An Andesite server',
         maxPlayers,
         ramMb,
         region,
@@ -144,22 +144,22 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
       type="button"
       onClick={() => selectPlatform(p.id)}
       className={`rounded-lg border p-3 text-left transition-colors ${platform === p.id
-        ? 'border-emerald-500/60 bg-emerald-500/10'
+        ? 'border-orange-500/60 bg-orange-500/10'
         : 'border-white/10 bg-white/[0.02] hover:border-white/25'}`}
       aria-pressed={platform === p.id}
     >
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-sm text-zinc-100">{p.label}</span>
-        {platform === p.id && <Check className="h-4 w-4 text-emerald-400" />}
+        <span className="font-semibold text-sm text-stone-100">{p.label}</span>
+        {platform === p.id && <Check className="h-4 w-4 text-orange-400" />}
       </div>
-      <p className="mt-1 text-xs text-zinc-500 leading-snug">{p.desc}</p>
+      <p className="mt-1 text-xs text-stone-500 leading-snug">{p.desc}</p>
     </button>
   ))
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="font-pixel text-xs text-emerald-400">
+        <DialogTitle className="font-display text-xs text-orange-400">
           {step <= 4 ? `DEPLOY A SERVER — ${step}/4` : 'DEPLOYING…'}
         </DialogTitle>
         <DialogDescription className="sr-only">Create a new Minecraft server</DialogDescription>
@@ -186,7 +186,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                   className="shrink-0 border-white/10 hover:bg-white/5"
                   aria-label="Random name"
                 >
-                  <Dices className="h-4 w-4 text-emerald-400" />
+                  <Dices className="h-4 w-4 text-orange-400" />
                 </Button>
               </div>
             </div>
@@ -202,10 +202,10 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 <SelectTrigger id="srv-version" className="bg-white/[0.03] border-white/10">
                   <SelectValue placeholder="Version" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-white/10 max-h-72">
+                <SelectContent className="bg-stone-950 border-white/10 max-h-72">
                   {versionsForPlatform(platform).map((v) => (
                     <SelectItem key={v.id} value={v.id}>
-                      {v.label}{v.note ? <span className="text-zinc-500"> — {v.note}</span> : null}
+                      {v.label}{v.note ? <span className="text-stone-500"> — {v.note}</span> : null}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -219,8 +219,8 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
           <motion.div key="s2" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-1.5"><Cpu className="h-4 w-4 text-emerald-400" /> Memory</Label>
-                <span className="font-mono text-sm text-emerald-400">{ramLabel(ramMb)}</span>
+                <Label className="flex items-center gap-1.5"><Cpu className="h-4 w-4 text-orange-400" /> Memory</Label>
+                <span className="font-mono text-sm text-orange-400">{ramLabel(ramMb)}</span>
               </div>
               <Slider
                 value={[ramMb]}
@@ -230,7 +230,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 onValueChange={([v]) => setRamMb(v)}
                 aria-label="Memory allocation"
               />
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-stone-500">
                 {ramMb <= 2048
                   ? '2 GB runs great for Vanilla with a few friends.'
                   : ramMb <= 4096
@@ -239,14 +239,14 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                       ? '8 GB suits a busy SMP with 25–60 players.'
                       : '16 GB for large communities and modpacks.'}
                 {' · '}
-                <span className="text-zinc-400">{planHint.name} plan ({planHint.priceLabel}{planHint.price > 0 ? planHint.period : ''})</span>
+                <span className="text-stone-400">{planHint.name} plan ({planHint.priceLabel}{planHint.price > 0 ? planHint.period : ''})</span>
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label>Player slots</Label>
-                <span className="font-mono text-sm text-emerald-400">{maxPlayers}</span>
+                <span className="font-mono text-sm text-orange-400">{maxPlayers}</span>
               </div>
               <Slider
                 value={[maxPlayers]}
@@ -259,12 +259,12 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="srv-region" className="flex items-center gap-1.5"><Globe className="h-4 w-4 text-emerald-400" /> Region</Label>
+              <Label htmlFor="srv-region" className="flex items-center gap-1.5"><Globe className="h-4 w-4 text-orange-400" /> Region</Label>
               <Select value={region} onValueChange={setRegion}>
                 <SelectTrigger id="srv-region" className="bg-white/[0.03] border-white/10">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-white/10">
+                <SelectContent className="bg-stone-950 border-white/10">
                   {REGIONS.map((r) => (
                     <SelectItem key={r.id} value={r.id}>
                       {r.label} · ~{r.ping} ms
@@ -284,7 +284,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 <Label>Gamemode</Label>
                 <Select value={gamemode} onValueChange={setGamemode}>
                   <SelectTrigger className="bg-white/[0.03] border-white/10"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-zinc-950 border-white/10">
+                  <SelectContent className="bg-stone-950 border-white/10">
                     {GAMEMODES.map((g) => <SelectItem key={g.id} value={g.id}>{g.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -293,7 +293,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 <Label>Difficulty</Label>
                 <Select value={difficulty} onValueChange={setDifficulty}>
                   <SelectTrigger className="bg-white/[0.03] border-white/10"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-zinc-950 border-white/10">
+                  <SelectContent className="bg-stone-950 border-white/10">
                     {DIFFICULTIES.map((d) => <SelectItem key={d.id} value={d.id}>{d.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -302,7 +302,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 <Label>World type</Label>
                 <Select value={worldType} onValueChange={setWorldType}>
                   <SelectTrigger className="bg-white/[0.03] border-white/10"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-zinc-950 border-white/10">
+                  <SelectContent className="bg-stone-950 border-white/10">
                     {WORLD_TYPES.map((w) => <SelectItem key={w.id} value={w.id}>{w.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -312,7 +312,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="srv-motd">MOTD — message of the day</Label>
-                <span className="text-[11px] text-zinc-600 font-mono">{motd.length}/59</span>
+                <span className="text-[11px] text-stone-600 font-mono">{motd.length}/59</span>
               </div>
               <Input
                 id="srv-motd"
@@ -327,15 +327,15 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5">
                 <div>
-                  <div className="text-sm font-medium text-zinc-200">PvP</div>
-                  <div className="text-xs text-zinc-600">Players can fight</div>
+                  <div className="text-sm font-medium text-stone-200">PvP</div>
+                  <div className="text-xs text-stone-600">Players can fight</div>
                 </div>
                 <Switch checked={pvp} onCheckedChange={setPvp} aria-label="Toggle PvP" />
               </div>
               <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5">
                 <div>
-                  <div className="text-sm font-medium text-zinc-200">Whitelist</div>
-                  <div className="text-xs text-zinc-600">Invite-only access</div>
+                  <div className="text-sm font-medium text-stone-200">Whitelist</div>
+                  <div className="text-xs text-stone-600">Invite-only access</div>
                 </div>
                 <Switch checked={whitelist} onCheckedChange={setWhitelist} aria-label="Toggle whitelist" />
               </div>
@@ -360,12 +360,12 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 ['Whitelist', whitelist ? 'On' : 'Off'],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2 text-sm">
-                  <span className="text-zinc-500">{k}</span>
-                  <span className="text-zinc-200 font-medium">{v}</span>
+                  <span className="text-stone-500">{k}</span>
+                  <span className="text-stone-200 font-medium">{v}</span>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-stone-600">
               Estimated deploy time: ~60 seconds. You can change everything later in Settings.
             </p>
           </motion.div>
@@ -375,11 +375,11 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
         {step === 5 && (
           <motion.div key="s5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-8 space-y-6">
             <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
-              <span className="text-sm text-zinc-300">{deployLabel}</span>
+              <Loader2 className="h-5 w-5 animate-spin text-orange-400" />
+              <span className="text-sm text-stone-300">{deployLabel}</span>
             </div>
-            <Progress value={deployProgress} className="h-2 bg-zinc-800" />
-            <div className="flex justify-between text-[11px] text-zinc-600 font-mono">
+            <Progress value={deployProgress} className="h-2 bg-stone-800" />
+            <div className="flex justify-between text-[11px] text-stone-600 font-mono">
               <span>{deployProgress}%</span>
               <span>node {region}-01</span>
             </div>
@@ -390,15 +390,15 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
       {/* footer nav */}
       {step <= 4 && (
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
-          <Button variant="ghost" disabled={step === 1} onClick={() => setStep((s) => s - 1)} className="text-zinc-400 hover:text-zinc-100">
+          <Button variant="ghost" disabled={step === 1} onClick={() => setStep((s) => s - 1)} className="text-stone-400 hover:text-stone-100">
             <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
           </Button>
           {step < 4 ? (
-            <Button disabled={!canNext} onClick={() => setStep((s) => s + 1)} className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold">
+            <Button disabled={!canNext} onClick={() => setStep((s) => s + 1)} className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold">
               Continue <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={deploy} disabled={createMutation.isPending || !name.trim()} className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold">
+            <Button onClick={deploy} disabled={createMutation.isPending || !name.trim()} className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold">
               <Rocket className="mr-1.5 h-4 w-4" /> Deploy server
             </Button>
           )}

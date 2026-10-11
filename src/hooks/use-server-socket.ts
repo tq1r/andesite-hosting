@@ -10,6 +10,8 @@ export interface ServerSocketHandlers {
   onStatus?: (status: ServerStatus) => void
   onStats?: (sample: StatsSample) => void
   onPlayers?: (names: string[]) => void
+  /** fires whenever the live engine connection drops or recovers */
+  onEngineChange?: (connected: boolean) => void
 }
 
 /**
@@ -54,12 +56,21 @@ export function useServerSocket(serverId: string | null | undefined, handlers: S
     socket.on('stats', onStats)
     socket.on('players', onPlayers)
 
+    const onConnect = () => handlersRef.current.onEngineChange?.(true)
+    const onDisconnect = () => handlersRef.current.onEngineChange?.(false)
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+    // report the initial state
+    handlersRef.current.onEngineChange?.(socket.connected)
+
     return () => {
       socket.off('logs', onLogs)
       socket.off('log', onLog)
       socket.off('status', onStatus)
       socket.off('stats', onStats)
       socket.off('players', onPlayers)
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
       socket.emit('unsubscribe', { serverId })
     }
   }, [serverId])

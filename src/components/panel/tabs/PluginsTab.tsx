@@ -70,7 +70,7 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
       <Card className="bg-white/[0.02] border-white/5">
         <div className="flex flex-col gap-3 px-3 py-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-600" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -87,8 +87,8 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
                 onClick={() => setCategory(c)}
                 className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
                   category === c
-                    ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-300'
-                    : 'border-white/10 text-zinc-500 hover:text-zinc-300 hover:border-white/25'
+                    ? 'border-orange-500/60 bg-orange-500/15 text-orange-300'
+                    : 'border-white/10 text-stone-500 hover:text-stone-300 hover:border-white/25'
                 }`}
                 aria-pressed={category === c}
               >
@@ -101,10 +101,10 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
 
       {/* installed strip */}
       {!isLoading && installed.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-          <span className="text-zinc-400 font-medium">{installed.length} {label.toLowerCase()} installed:</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-stone-500">
+          <span className="text-stone-400 font-medium">{installed.length} {label.toLowerCase()} installed:</span>
           {installed.map((n) => (
-            <Badge key={n} variant="outline" className="border-emerald-800/60 bg-emerald-950/40 text-emerald-300 font-normal">
+            <Badge key={n} variant="outline" className="border-orange-800/60 bg-orange-950/40 text-orange-300 font-normal">
               {n}
             </Badge>
           ))}
@@ -127,9 +127,9 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
       ) : filtered.length === 0 ? (
         <Card className="bg-white/[0.02] border-white/5">
           <CardContent className="py-14 flex flex-col items-center text-center gap-2">
-            <Puzzle className="h-9 w-9 text-zinc-700" />
-            <p className="text-sm text-zinc-500">Nothing matches “{search}”.</p>
-            <p className="text-xs text-zinc-600">Try a different keyword or category.</p>
+            <Puzzle className="h-9 w-9 text-stone-700" />
+            <p className="text-sm text-stone-500">Nothing matches “{search}”.</p>
+            <p className="text-xs text-stone-600">Try a different keyword or category.</p>
           </CardContent>
         </Card>
       ) : (
@@ -142,23 +142,23 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
                 <CardContent className="flex h-full flex-col gap-2.5 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm text-zinc-100 truncate">{p.name}</p>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="font-semibold text-sm text-stone-100 truncate">{p.name}</p>
+                      <p className="text-[11px] text-stone-500">
                         by {p.author} · v{p.version}
                       </p>
                     </div>
-                    <Badge variant="outline" className="shrink-0 border-white/10 bg-white/[0.03] text-zinc-400 text-[10px]">
+                    <Badge variant="outline" className="shrink-0 border-white/10 bg-white/[0.03] text-stone-400 text-[10px]">
                       {p.category}
                     </Badge>
                   </div>
-                  <p className="text-xs text-zinc-500 leading-relaxed flex-1">{p.desc}</p>
+                  <p className="text-xs text-stone-500 leading-relaxed flex-1">{p.desc}</p>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-zinc-600 font-mono">
+                    <span className="text-[11px] text-stone-600 font-mono">
                       ↓ {p.downloads} · {(p.sizeKb / 1024).toFixed(1)} MB
                     </span>
                     {isInstalled ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="flex items-center gap-1 text-xs text-emerald-400">
+                        <span className="flex items-center gap-1 text-xs text-orange-400">
                           <Check className="h-3.5 w-3.5" /> Installed
                         </span>
                         <Button
@@ -166,7 +166,7 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
                           variant="ghost"
                           disabled={busy}
                           onClick={() => actionMutation.mutate({ pluginId: p.id, action: 'uninstall' })}
-                          className="h-7 w-7 p-0 text-zinc-600 hover:text-red-400 hover:bg-red-500/10"
+                          className="h-7 w-7 p-0 text-stone-600 hover:text-red-400 hover:bg-red-500/10"
                           aria-label={`Uninstall ${p.name}`}
                         >
                           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
@@ -177,7 +177,7 @@ export function PluginsTab({ server }: { server: ServerDTO }) {
                         size="sm"
                         disabled={busy}
                         onClick={() => actionMutation.mutate({ pluginId: p.id, action: 'install' })}
-                        className="h-7 bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold"
+                        className="h-7 bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold"
                       >
                         {busy ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Download className="mr-1 h-3.5 w-3.5" />}
                         Install

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Based on the image, here are the details for the console tab:\n\n**Status/Label near the console header:**\n*   **\"starting\"** (located at the top right of the console box, next to a small grey dot).\n\n**Is there an 'engine offline' amber chip?**\n*   **No.** There is no \"engine offline\" chip visible. The only status indicator is the text **\"starting\"**.\n\n**Text in the empty console area:**\n*   The area is not completely empty; it contains one log line:\n    `[02:57:02] [ServerMain/INFO]: Loading Minecraft 26.3 with Java 25.0.2`\n\n**Any log lines visible?**\n*   **Yes**, there is exactly **one** log line visible, which is the loading message mentioned above. The rest of the console area below it appears to be empty (black space).",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1791687462,
+  "id": "202610111057401c2f7f0cbfe645df",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202610111057401c2f7f0cbfe645df",
+  "usage": {
+    "completion_tokens": 189,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 941,
+    "prompt_tokens_details": {
+      "cached_tokens": 2
+    },
+    "total_tokens": 1130
+  }
+}

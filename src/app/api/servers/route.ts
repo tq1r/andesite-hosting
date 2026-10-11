@@ -10,7 +10,7 @@ const createSchema = z.object({
   name: z.string().trim().min(1).max(40),
   platform: z.enum(['vanilla', 'paper', 'spigot', 'fabric', 'forge']),
   version: z.string().min(1).max(12),
-  motd: z.string().trim().min(1).max(59).default('A CraftHost Server'),
+  motd: z.string().trim().min(1).max(59).default('An Andesite server'),
   maxPlayers: z.number().int().min(2).max(200).default(20),
   ramMb: z.number().int().min(1024).max(16384).default(2048),
   region: z.enum(['us-east', 'us-west', 'eu-central', 'eu-west', 'ap-south', 'ap-northeast']).default('us-east'),

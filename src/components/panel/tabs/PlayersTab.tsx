@@ -74,14 +74,14 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
       {/* Online now */}
       <Card className="bg-white/[0.02] border-white/5">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium text-stone-300">
             <UserRoundCheck className="h-4 w-4 text-emerald-400" /> Online now
-            <span className="ml-1 font-mono text-xs text-zinc-500">{onlineNames.length} connected</span>
+            <span className="ml-1 font-mono text-xs text-stone-500">{onlineNames.length} connected</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {onlineNames.length === 0 ? (
-            <p className="text-sm text-zinc-600 py-2">No players connected. The server simulates players joining a minute or so after boot.</p>
+            <p className="text-sm text-stone-600 py-2">No players connected. The server simulates players joining a minute or so after boot.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {onlineNames.map((name) => {
@@ -89,12 +89,12 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
                 return (
                   <div key={name} className="flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.07] pl-1.5 pr-2.5 py-1.5">
                     <PixelAvatar name={name} size={22} className="rounded-full" />
-                    <span className="text-sm text-zinc-200">{name}</span>
+                    <span className="text-sm text-stone-200">{name}</span>
                     {known?.isOp && <ShieldCheck className="h-3 w-3 text-emerald-400" aria-label="operator" />}
                     <button
                       onClick={() => kick(name)}
                       disabled={server.status !== 'online'}
-                      className="ml-1 rounded-full p-1 text-zinc-500 hover:bg-red-500/15 hover:text-red-400 disabled:opacity-30 transition-colors"
+                      className="ml-1 rounded-full p-1 text-stone-500 hover:bg-red-500/15 hover:text-red-400 disabled:opacity-30 transition-colors"
                       aria-label={`Kick ${name}`}
                       title={`Kick ${name}`}
                     >
@@ -111,7 +111,7 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
       {/* Known players */}
       <Card className="bg-white/[0.02] border-white/5">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-zinc-300">Known players ({players.length})</CardTitle>
+          <CardTitle className="text-sm font-medium text-stone-300">Known players ({players.length})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
@@ -129,11 +129,11 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="text-zinc-500">Player</TableHead>
-                    <TableHead className="text-zinc-500 hidden sm:table-cell">Status</TableHead>
-                    <TableHead className="text-zinc-500 hidden md:table-cell text-right">Joins</TableHead>
-                    <TableHead className="text-zinc-500 hidden md:table-cell text-right">Playtime</TableHead>
-                    <TableHead className="text-zinc-500 hidden lg:table-cell">Last seen</TableHead>
+                    <TableHead className="text-stone-500">Player</TableHead>
+                    <TableHead className="text-stone-500 hidden sm:table-cell">Status</TableHead>
+                    <TableHead className="text-stone-500 hidden md:table-cell text-right">Joins</TableHead>
+                    <TableHead className="text-stone-500 hidden md:table-cell text-right">Playtime</TableHead>
+                    <TableHead className="text-stone-500 hidden lg:table-cell">Last seen</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
@@ -145,12 +145,12 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
                           <PixelAvatar name={p.name} size={28} />
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-zinc-200">{p.name}</span>
+                              <span className="font-medium text-stone-200">{p.name}</span>
                               {onlineSet.has(p.name) && (
                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" title="online" />
                               )}
                             </div>
-                            <span className="text-[10px] text-zinc-600 font-mono">{p.uuid.slice(0, 13)}…</span>
+                            <span className="text-[10px] text-stone-600 font-mono">{p.uuid.slice(0, 13)}…</span>
                           </div>
                         </div>
                       </TableCell>
@@ -159,14 +159,14 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
                           {p.isOp && <Badge className="bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/15 border-0 text-[10px] px-1.5">OP</Badge>}
                           {p.isWhitelisted && <Badge className="bg-sky-500/15 text-sky-300 hover:bg-sky-500/15 border-0 text-[10px] px-1.5">WHITELIST</Badge>}
                           {p.isBanned && <Badge className="bg-red-500/15 text-red-300 hover:bg-red-500/15 border-0 text-[10px] px-1.5">BANNED</Badge>}
-                          {!p.isOp && !p.isBanned && !p.isWhitelisted && <span className="text-xs text-zinc-600">regular</span>}
+                          {!p.isOp && !p.isBanned && !p.isWhitelisted && <span className="text-xs text-stone-600">regular</span>}
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-right font-mono text-zinc-400">{p.joins}</TableCell>
-                      <TableCell className="hidden md:table-cell text-right font-mono text-zinc-400">
+                      <TableCell className="hidden md:table-cell text-right font-mono text-stone-400">{p.joins}</TableCell>
+                      <TableCell className="hidden md:table-cell text-right font-mono text-stone-400">
                         {p.playTimeMin >= 60 ? `${Math.floor(p.playTimeMin / 60)}h ${p.playTimeMin % 60}m` : `${p.playTimeMin}m`}
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell text-zinc-500 text-xs">
+                      <TableCell className="hidden lg:table-cell text-stone-500 text-xs">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {onlineSet.has(p.name) ? 'now' : formatDistanceToNow(new Date(p.lastSeen), { addSuffix: true })}
@@ -175,7 +175,7 @@ export function PlayersTab({ server }: { server: ServerDTO }) {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-zinc-200" aria-label={`Actions for ${p.name}`}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-500 hover:text-stone-200" aria-label={`Actions for ${p.name}`}>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>

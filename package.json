@@ -1,16 +1,21 @@
 {
-  "name": "nextjs_tailwind_shadcn_ts",
-  "version": "0.2.1",
+  "name": "andesite-hosting",
+  "version": "1.0.0",
+  "description": "Carved-from-stone Minecraft server hosting — landing page + full server management panel (Next.js + Prisma + live simulation engine).",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
-    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+    "build": "next build",
+    "build:standalone": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
+    "postinstall": "prisma generate",
     "lint": "eslint .",
     "db:push": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "engine": "cd mini-services/mc-engine && bun install && bun run dev",
+    "brand:assets": "node scripts/gen-brand-assets.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

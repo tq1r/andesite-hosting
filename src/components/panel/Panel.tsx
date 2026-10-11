@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, LayoutDashboard, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CreeperMark } from '@/components/CreeperMark'
+import { AndesiteMark } from '@/components/AndesiteMark'
 import { PixelAvatar } from '@/components/PixelAvatar'
 import { api } from '@/lib/api'
 import { getSocket } from '@/lib/socket'
@@ -78,10 +78,10 @@ export function Panel() {
       {/* ── Top bar ── */}
       <header className="sticky top-0 z-40 h-16 shrink-0 border-b border-white/5 bg-background/85 backdrop-blur-md">
         <div className="h-full px-4 flex items-center justify-between gap-3">
-          <button onClick={closeServer} className="flex items-center gap-2.5 group" aria-label="CraftHost home">
-            <CreeperMark size={26} />
-            <span className="font-pixel text-xs sm:text-sm text-emerald-400 group-hover:text-emerald-300 transition-colors">
-              CraftHost
+          <button onClick={closeServer} className="flex items-center gap-2.5 group" aria-label="Andesite home">
+            <AndesiteMark size={26} />
+            <span className="font-display text-sm sm:text-base font-semibold tracking-tight text-stone-100 group-hover:text-orange-300 transition-colors">
+              Andesite <span className="text-stone-500 font-normal">Hosting</span>
             </span>
           </button>
 
@@ -89,7 +89,7 @@ export function Panel() {
           <div className="lg:hidden flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
             <button
               onClick={closeServer}
-              className={`shrink-0 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors ${!activeServerId ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300' : 'border-white/10 text-zinc-400'}`}
+              className={`shrink-0 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors ${!activeServerId ? 'border-orange-500/50 bg-orange-500/10 text-orange-300' : 'border-white/10 text-stone-400'}`}
             >
               <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
             </button>
@@ -97,7 +97,7 @@ export function Panel() {
               <button
                 key={s.id}
                 onClick={() => openServer(s.id)}
-                className={`shrink-0 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors ${s.id === activeServerId ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300' : 'border-white/10 text-zinc-400'}`}
+                className={`shrink-0 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors ${s.id === activeServerId ? 'border-orange-500/50 bg-orange-500/10 text-orange-300' : 'border-white/10 text-stone-400'}`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${STATUS_META[s.status].dot}`} />
                 {s.name.length > 18 ? s.name.slice(0, 18) + '…' : s.name}
@@ -106,17 +106,17 @@ export function Panel() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button onClick={() => openWizard()} size="sm" className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold">
+            <Button onClick={() => openWizard()} size="sm" className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold">
               <Plus className="mr-1 h-4 w-4" /> <span className="hidden sm:inline">Create server</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="rounded-full ring-1 ring-white/10 hover:ring-emerald-500/50 transition-colors" aria-label="Account menu">
+                <button className="rounded-full ring-1 ring-white/10 hover:ring-orange-500/50 transition-colors" aria-label="Account menu">
                   <PixelAvatar name="Steve" size={32} className="rounded-full" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuLabel className="text-xs text-zinc-500">Signed in as</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs text-stone-500">Signed in as</DropdownMenuLabel>
                 <DropdownMenuLabel>Steve</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={goLanding} className="cursor-pointer">
@@ -134,39 +134,39 @@ export function Panel() {
           <nav className="p-3 space-y-1" aria-label="Servers">
             <button
               onClick={closeServer}
-              className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors ${!activeServerId ? 'bg-emerald-500/10 text-emerald-300' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'}`}
+              className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors ${!activeServerId ? 'bg-orange-500/10 text-orange-300' : 'text-stone-400 hover:bg-white/5 hover:text-stone-200'}`}
             >
               <LayoutDashboard className="h-4 w-4" /> Dashboard
             </button>
 
-            <div className="pt-4 pb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
+            <div className="pt-4 pb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-stone-600">
               Your servers · {servers.length}
             </div>
             {servers.map((s) => (
               <button
                 key={s.id}
                 onClick={() => openServer(s.id)}
-                className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors ${s.id === activeServerId ? 'bg-emerald-500/10 text-emerald-300' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'}`}
+                className={`w-full flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors ${s.id === activeServerId ? 'bg-orange-500/10 text-orange-300' : 'text-stone-400 hover:bg-white/5 hover:text-stone-200'}`}
               >
                 <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_META[s.status].dot}`} />
                 <span className="truncate text-left">{s.name}</span>
-                <span className="ml-auto text-[10px] text-zinc-600 shrink-0">{platformLabel(s.platform)}</span>
+                <span className="ml-auto text-[10px] text-stone-600 shrink-0">{platformLabel(s.platform)}</span>
               </button>
             ))}
             {servers.length === 0 && (
-              <p className="px-3 py-2 text-xs text-zinc-600">No servers yet. Create your first one!</p>
+              <p className="px-3 py-2 text-xs text-stone-600">No servers yet. Create your first one!</p>
             )}
           </nav>
 
           <div className="mt-auto p-3">
-            <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 text-xs text-zinc-500">
+            <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 text-xs text-stone-500">
               <div className="flex items-center justify-between">
                 <span>Nodes online</span>
-                <span className="text-emerald-400">6 / 6</span>
+                <span className="text-orange-400">6 / 6</span>
               </div>
               <div className="mt-1.5 flex items-center justify-between">
                 <span>Engine</span>
-                <span className="flex items-center gap-1.5 text-emerald-400">
+                <span className="flex items-center gap-1.5 text-orange-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> healthy
                 </span>
               </div>

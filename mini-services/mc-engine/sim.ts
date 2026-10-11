@@ -1,4 +1,4 @@
-// CraftHost engine — Minecraft server simulation core
+// Andesite engine — Minecraft server simulation core
 // In-memory runtimes: boot sequence, live events, metrics, command handling
 
 export type ServerStatus = 'offline' | 'starting' | 'online' | 'stopping'

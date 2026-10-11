@@ -58,11 +58,11 @@ export function StatsTab({ server }: { server: ServerDTO }) {
         {cards.map((c) => (
           <Card key={c.label} className="bg-white/[0.02] border-white/5">
             <CardContent className="p-4">
-              <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-zinc-600">
-                <c.icon className="h-3.5 w-3.5 text-emerald-400" /> {c.label}
+              <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-stone-600">
+                <c.icon className="h-3.5 w-3.5 text-orange-400" /> {c.label}
               </div>
-              <div className="mt-2 text-xl font-semibold font-mono text-zinc-100">{c.value}</div>
-              <div className="mt-0.5 text-[11px] text-zinc-600">{c.sub}</div>
+              <div className="mt-2 text-xl font-semibold font-mono text-stone-100">{c.value}</div>
+              <div className="mt-0.5 text-[11px] text-stone-600">{c.sub}</div>
             </CardContent>
           </Card>
         ))}
@@ -70,7 +70,7 @@ export function StatsTab({ server }: { server: ServerDTO }) {
 
       <Card className="bg-white/[0.02] border-white/5">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-zinc-300">CPU load — last {MAX_SAMPLES * 2}s</CardTitle>
+          <CardTitle className="text-sm font-medium text-stone-300">CPU load — last {MAX_SAMPLES * 2}s</CardTitle>
         </CardHeader>
         <CardContent className="h-56">
           {online ? (
@@ -90,7 +90,7 @@ export function StatsTab({ server }: { server: ServerDTO }) {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-sm text-zinc-600">
+            <div className="h-full flex items-center justify-center text-sm text-stone-600">
               Server is offline — start it to collect live metrics.
             </div>
           )}
@@ -100,7 +100,7 @@ export function StatsTab({ server }: { server: ServerDTO }) {
       <div className="grid md:grid-cols-2 gap-4">
         <Card className="bg-white/[0.02] border-white/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-300">Memory usage %</CardTitle>
+            <CardTitle className="text-sm font-medium text-stone-300">Memory usage %</CardTitle>
           </CardHeader>
           <CardContent className="h-44">
             {online ? (
@@ -120,14 +120,14 @@ export function StatsTab({ server }: { server: ServerDTO }) {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-sm text-zinc-600">No data — server offline.</div>
+              <div className="h-full flex items-center justify-center text-sm text-stone-600">No data — server offline.</div>
             )}
           </CardContent>
         </Card>
 
         <Card className="bg-white/[0.02] border-white/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-300">Ticks per second (TPS)</CardTitle>
+            <CardTitle className="text-sm font-medium text-stone-300">Ticks per second (TPS)</CardTitle>
           </CardHeader>
           <CardContent className="h-44">
             {online ? (
@@ -147,7 +147,7 @@ export function StatsTab({ server }: { server: ServerDTO }) {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-sm text-zinc-600">No data — server offline.</div>
+              <div className="h-full flex items-center justify-center text-sm text-stone-600">No data — server offline.</div>
             )}
           </CardContent>
         </Card>

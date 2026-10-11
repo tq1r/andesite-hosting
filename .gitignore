@@ -52,3 +52,8 @@ prompt
 server.log
 # Skills directory
 /skills/
+# QA screenshots & analysis artifacts (kept locally, not for the repo)
+scripts/*.png
+scripts/*analysis*.json
+scripts/search-*.json
+engine.log

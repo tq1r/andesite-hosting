@@ -62,7 +62,7 @@ export async function POST(req: Request, ctx: Ctx) {
       },
     })
     // announce on the live console if the server is running
-    await engineCommand(id, `say [CraftHost] Installed ${item.name} v${item.version} — restart to load it`)
+    await engineCommand(id, `say [Andesite] Installed ${item.name} v${item.version} — restart to load it`)
     return NextResponse.json({ ok: true, installed: await serverPluginNames(id) }, { status: 201 })
   }
 

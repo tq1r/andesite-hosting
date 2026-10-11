@@ -84,15 +84,15 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
     <div className="space-y-4 max-w-3xl">
       <Card className="bg-white/[0.02] border-white/5">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <HardDriveDownload className="h-4 w-4 text-emerald-400" /> World backups
-            <span className="font-mono text-xs text-zinc-500">({backups.length})</span>
+          <div className="flex items-center gap-2 text-sm font-medium text-stone-300">
+            <HardDriveDownload className="h-4 w-4 text-orange-400" /> World backups
+            <span className="font-mono text-xs text-stone-500">({backups.length})</span>
           </div>
           <Button
             size="sm"
             onClick={() => createMutation.mutate()}
             disabled={createMutation.isPending}
-            className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold"
+            className="bg-orange-500 text-stone-950 hover:bg-orange-400 font-semibold"
           >
             <Plus className="mr-1 h-4 w-4" /> {createMutation.isPending ? 'Backing up…' : 'Create backup'}
           </Button>
@@ -113,9 +113,9 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
             </div>
           ) : backups.length === 0 ? (
             <div className="py-14 flex flex-col items-center text-center gap-2">
-              <Package className="h-9 w-9 text-zinc-700" />
-              <p className="text-sm text-zinc-500">No backups yet.</p>
-              <p className="text-xs text-zinc-600 max-w-xs">
+              <Package className="h-9 w-9 text-stone-700" />
+              <p className="text-sm text-stone-500">No backups yet.</p>
+              <p className="text-xs text-stone-600 max-w-xs">
                 Snapshots capture the entire world folder. Create one before big updates — griefing insurance, one click.
               </p>
             </div>
@@ -123,18 +123,18 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
             <ul className="divide-y divide-white/[0.04]">
               {backups.map((b) => (
                 <li key={b.id} className="flex items-center gap-3 px-4 py-3">
-                  <span className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                    <HardDriveDownload className="h-4 w-4 text-emerald-400" />
+                  <span className="h-9 w-9 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                    <HardDriveDownload className="h-4 w-4 text-orange-400" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-mono text-[13px] text-zinc-200 truncate">{b.name}</p>
-                    <p className="text-[11px] text-zinc-600">
+                    <p className="font-mono text-[13px] text-stone-200 truncate">{b.name}</p>
+                    <p className="text-[11px] text-stone-600">
                       {format(new Date(b.createdAt), 'MMM d, yyyy HH:mm')} · {b.sizeMb} MB
                     </p>
                   </div>
                   <Button
                     size="sm" variant="ghost" onClick={() => downloadBackup(b)}
-                    className="h-8 w-8 p-0 text-zinc-500 hover:text-emerald-300 hover:bg-emerald-500/10"
+                    className="h-8 w-8 p-0 text-stone-500 hover:text-orange-300 hover:bg-orange-500/10"
                     aria-label={`Download ${b.name}`}
                   >
                     <Download className="h-4 w-4" />
@@ -144,7 +144,7 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
                   </Button>
                   <Button
                     size="sm" variant="ghost" onClick={() => setDeleteTarget(b)}
-                    className="h-8 w-8 p-0 text-zinc-500 hover:text-red-400 hover:bg-red-500/10"
+                    className="h-8 w-8 p-0 text-stone-500 hover:text-red-400 hover:bg-red-500/10"
                     aria-label={`Delete ${b.name}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -157,7 +157,7 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
       </Card>
 
       <AlertDialog open={!!restoreTarget} onOpenChange={(o) => !o && setRestoreTarget(null)}>
-        <AlertDialogContent className="bg-zinc-950 border-white/10">
+        <AlertDialogContent className="bg-stone-950 border-white/10">
           <AlertDialogHeader>
             <AlertDialogTitle>Restore “{restoreTarget?.name}”?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -168,7 +168,7 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
             <AlertDialogCancel className="border-white/10">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => restoreTarget && restoreMutation.mutate(restoreTarget.id)}
-              className="bg-amber-500 text-zinc-950 hover:bg-amber-400"
+              className="bg-amber-500 text-stone-950 hover:bg-amber-400"
             >
               Restore world
             </AlertDialogAction>
@@ -177,7 +177,7 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
       </AlertDialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent className="bg-zinc-950 border-white/10">
+        <AlertDialogContent className="bg-stone-950 border-white/10">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete “{deleteTarget?.name}”?</AlertDialogTitle>
             <AlertDialogDescription>This snapshot will be permanently removed.</AlertDialogDescription>

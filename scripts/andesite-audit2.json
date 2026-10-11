@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "```json\n{\n  \"pricing_plans\": {\n    \"names\": [\"Andesite\", \"Diorite\", \"Granite\", \"Obsidian\"],\n    \"popular_badge\": {\n      \"plan\": \"Granite\",\n      \"color\": \"orange\",\n      \"text\": \"Most popular\"\n    }\n  },\n  \"sections_status\": {\n    \"features\": \"intact and readable\",\n    \"how_it_works\": \"intact and readable (Three blocks to success)\",\n    \"faq\": \"intact and readable (Questions & answers)\"\n  },\n  \"visual_quality\": {\n    \"green_branding\": \"none found\",\n    \"defects\": \"none observed\",\n    \"overlapping_text\": \"none\",\n    \"cut_off_text\": \"none\"\n  },\n  \"aesthetic_cohesion\": {\n    \"theme\": \"stone/andesite\",\n    \"palette\": \"dark grey/black with orange accents\",\n    \"verdict\": \"cohesive\"\n  }\n}\n```",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1791687345,
+  "id": "20261011105538692623e7f882489b",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261011105538692623e7f882489b",
+  "usage": {
+    "completion_tokens": 208,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6095,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 6303
+  }
+}
