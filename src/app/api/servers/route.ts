@@ -55,7 +55,7 @@ export async function POST(req: Request) {
   const server = await db.server.create({ data: { ...data, port } })
 
   const props = genProperties(data)
-  await seedFileTree(server.id, data.platform, props)
+  await seedFileTree(server.id, data.platform, data.version, props)
   await seedPlayers(server.id, data.whitelist)
 
   await db.activity.create({

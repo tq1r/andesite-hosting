@@ -19,8 +19,8 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { api, sendCommand } from '@/lib/api'
 import {
-  VERSIONS, REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES,
-  ramLabel, platformLabel, type ServerDTO,
+  REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES,
+  ramLabel, platformLabel, versionLabel, type ServerDTO,
 } from '@/lib/mc'
 import { useAppStore } from '@/lib/store'
 
@@ -132,7 +132,7 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
             <div className="space-y-2">
               <Label>Version</Label>
               <div className="rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-sm text-zinc-400">
-                {server.version} — reinstall required to change
+                {versionLabel(server.version)} — reinstall required to change
               </div>
             </div>
           </div>

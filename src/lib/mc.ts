@@ -94,27 +94,66 @@ export interface ActivityDTO {
   createdAt: string
 }
 
-// ─── Catalog data ────────────────────────────────────────────────────────────
+// Catalog data — versions verified against Mojang piston-meta manifest,
+// PaperMC (fill.papermc.io v3), Fabric meta & NeoForge maven, Oct 2026.
+// Since 26.1 Minecraft uses calendar-year versioning ("26" = 2026).
+export const LATEST_VERSION = '26.3'
+export const LATEST_DROP = 'Wilderness Bound'
 
 export const PLATFORMS = [
   { id: 'vanilla', label: 'Vanilla', desc: 'Official Mojang server. Pure, unmodified gameplay.', pluginSupport: false },
   { id: 'paper', label: 'Paper', desc: 'High-performance fork with plugin support. The community favorite.', pluginSupport: true },
   { id: 'spigot', label: 'Spigot', desc: 'Classic plugin server. battle-tested by thousands of networks.', pluginSupport: true },
   { id: 'fabric', label: 'Fabric', desc: 'Lightweight modding platform for modern versions.', pluginSupport: true },
-  { id: 'forge', label: 'Forge', desc: 'The heavyweight mod loader. Build giant modpacks.', pluginSupport: true },
+  { id: 'forge', label: 'Forge', desc: 'The heavyweight mod loader (NeoForge on 26.x). Build giant modpacks.', pluginSupport: true },
 ] as const
 
-export const VERSIONS = [
-  { id: '1.21.4', label: '1.21.4 (latest)' },
-  { id: '1.21.1', label: '1.21.1' },
+export interface VersionEntry {
+  id: string
+  label: string
+  note?: string // game drop name / era note
+}
+
+export const VERSIONS: VersionEntry[] = [
+  { id: '26.3', label: '26.3', note: 'Wilderness Bound · latest release' },
+  { id: '26.2', label: '26.2', note: 'Chaos Cubed' },
+  { id: '26.1.2', label: '26.1.2', note: 'Tiny Takeover' },
+  { id: '1.21.11', label: '1.21.11' },
+  { id: '1.21.10', label: '1.21.10' },
+  { id: '1.21.9', label: '1.21.9' },
+  { id: '1.21.8', label: '1.21.8' },
+  { id: '1.21.4', label: '1.21.4' },
   { id: '1.20.6', label: '1.20.6' },
   { id: '1.20.4', label: '1.20.4' },
   { id: '1.19.4', label: '1.19.4' },
   { id: '1.18.2', label: '1.18.2' },
   { id: '1.16.5', label: '1.16.5' },
-  { id: '1.12.2', label: '1.12.2 (mods classic)' },
-  { id: '1.8.8', label: '1.8.8 (PvP classic)' },
+  { id: '1.12.2', label: '1.12.2', note: 'mods classic' },
+  { id: '1.8.8', label: '1.8.8', note: 'PvP classic' },
 ]
+
+// Per-platform availability (verified Oct 2026):
+// - Paper/Spigot build for every version incl. legacy 1.8.8 / 1.12.2
+// - Fabric only supports 1.14+ (no 1.12.2 / 1.8.8)
+// - Forge/NeoForge: 26.x via NeoForge (beta builds), no 1.8.8 builds
+export const PLATFORM_VERSIONS: Record<string, string[]> = {
+  vanilla: VERSIONS.map((v) => v.id),
+  paper: VERSIONS.map((v) => v.id),
+  spigot: VERSIONS.map((v) => v.id),
+  fabric: VERSIONS.map((v) => v.id).filter((id) => id !== '1.12.2' && id !== '1.8.8'),
+  forge: VERSIONS.map((v) => v.id).filter((id) => id !== '1.8.8'),
+}
+
+export function versionsForPlatform(platform: string): VersionEntry[] {
+  const allowed = PLATFORM_VERSIONS[platform] ?? VERSIONS.map((v) => v.id)
+  return VERSIONS.filter((v) => allowed.includes(v.id))
+}
+
+// "26.3 · Wilderness Bound" (falls back to the raw id for unknown versions)
+export function versionLabel(id: string): string {
+  const v = VERSIONS.find((x) => x.id === id)
+  return v?.note ? `${v.label} · ${v.note}` : id
+}
 
 export const REGIONS = [
   { id: 'us-east', label: 'US East — Ashburn', ping: 12 },

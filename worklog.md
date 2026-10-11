@@ -1,6 +1,34 @@
 # Worklog
 
 ---
+Task ID: 3
+Agent: main (Super Z)
+Task: Research CURRENT real Minecraft versions via live web sources (user: "1.21.4 isn't the latest — research, don't use your data") and update the whole app to the real version catalog
+
+Work Log:
+- Researched via live APIs/docs (NOT training data):
+  - Mojang piston-meta manifest → latest release 26.3 (2026-09-15), snapshot 26.4-snapshot-3
+  - minecraft.net (Dec 2, 2025 announcement) → version scheme now calendar-year based ("26" = 2026); 1.21.11 (2025-12-09) was the last 1.21.x
+  - minecraft.wiki → 26.3 "Wilderness Bound" (Dappled Forest, shelf mushrooms, abandoned camps); 26.2 "Chaos Cubed" (sulfur caves, 2026-06-16); 26.1 "Tiny Takeover" (2026-03-24, Golden Dandelion); launcher bundles Java SE 25 since 26.1
+  - PaperMC v3 API (fill.papermc.io) → Paper builds 26.3/26.2/26.1.x/1.21.11→1.21.4
+  - Fabric meta → stable 26.3→1.16.5 (no 1.12.2/1.8.8)
+  - NeoForge maven → 26.3.0.x-beta builds exist
+- src/lib/mc.ts: rewrote VERSIONS catalog (26.3/26.2/26.1.2 + 1.21.11→1.8.8) with drop-name notes; added LATEST_VERSION/LATEST_DROP, PLATFORM_VERSIONS compat map + versionsForPlatform() + versionLabel() helpers
+- CreateServerWizard: default version 26.3; version list now filtered per platform (Fabric excludes 1.12.2/1.8.8, Forge excludes 1.8.8); version auto-resets to latest allowed when platform can't build it; dropdown shows drop names
+- SettingsTab: version box shows rich label ("26.3 · Wilderness Bound"); removed unused VERSIONS import
+- Landing: "Any version" feature + versions FAQ now cite 26.3 "Wilderness Bound" + NeoForge note
+- seed.ts: 26.x-era jar names (fabric-api-0.131.2+<ver>.jar, jei-<ver>-neoforge.jar, sodium→spark swap — sodium is client-side); latest.log seeded in new boot format; seedFileTree now takes version param (route.ts updated)
+- mc-engine sim.ts: boot sequence reworked to 26.x-era logs (ServerMain thread, "Loading Minecraft <ver> with Java 25.0.2", permissions.yml line gated to Bukkit platforms)
+- scripts/update-db-versions.py: migrated demo DB — Blockhaven SMP → Paper 26.3, Emerald Isle → Fabric 26.2; renamed mod/plugin jars in DB; regenerated latest.log contents
+- Restarted mc-engine (clean state, new boot sequence); lint clean
+- Verified via agent-browser (gateway :81): landing copy shows 26.3 Wilderness Bound; cards show Paper 26.3 / Fabric 26.2; boot log streams "Loading Minecraft 26.3 with Java 25.0.2" → "Starting minecraft server version 26.3" → Paper line → Done; wizard defaults 26.3, Fabric dropdown ends at 1.16.5, Paper shows all 15 incl. 1.12.2/1.8.8; full deploy of test server on Vanilla 26.3 (seeded files show new log format) then deleted it; zero page errors
+
+Stage Summary:
+- App now matches the real October 2026 Minecraft ecosystem: latest 26.3 "Wilderness Bound" (Sept 15, 2026), calendar-year versioning, Java 25 runtime, per-platform version availability verified against PaperMC/Fabric/NeoForge APIs
+- Demo state: Blockhaven SMP (Paper 26.3, boots with Java 25 line) + Emerald Isle (Fabric 26.2); wizard is platform-aware
+- Research artifacts: scripts/mc-manifest.json, scripts/search-*.json; migration script: scripts/update-db-versions.py
+
+---
 Task ID: 1
 Agent: main (Super Z)
 Task: Build CraftHost — Minecraft server hosting website (GTA-hosting style) with landing page + full server management panel

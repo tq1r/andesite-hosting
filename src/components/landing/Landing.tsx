@@ -12,7 +12,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion'
 import { CreeperMark } from '@/components/CreeperMark'
-import { PLANS, PLATFORMS } from '@/lib/mc'
+import { PLANS, PLATFORMS, LATEST_VERSION, LATEST_DROP } from '@/lib/mc'
 import { useAppStore } from '@/lib/store'
 
 const FEATURES = [
@@ -23,7 +23,7 @@ const FEATURES = [
   { icon: HardDriveDownload, title: 'Automatic backups', desc: 'Scheduled world snapshots with one-click restore. Griefers can\'t undo your work.' },
   { icon: Activity, title: 'Real-time metrics', desc: 'CPU, RAM, TPS and network charts streamed live, so you catch lag before players do.' },
   { icon: FolderCog, title: 'Full file access', desc: 'Edit server.properties, manage plugin configs and browse world data in your browser.' },
-  { icon: Repeat, title: 'Any version', desc: 'From 1.8.8 PvP classics to the latest 1.21.4 release — switch in a click.' },
+  { icon: Repeat, title: 'Any version', desc: `From 1.8.8 PvP classics to the latest ${LATEST_VERSION} “${LATEST_DROP}” drop — switch in a click.` },
 ]
 
 const STEPS = [
@@ -34,7 +34,7 @@ const STEPS = [
 
 const FAQS = [
   { q: 'Can I really host a server for free?', a: 'Yes — the Dirt plan gives you 2 GB of RAM, 10 GB of NVMe storage and the full panel with no credit card and no trial timer. It\'s perfect for a small survival world with friends.' },
-  { q: 'Which platforms and versions are supported?', a: 'Vanilla, Paper, Spigot, Fabric and Forge, from 1.8.8 up to the latest 1.21.4 release. You can deploy multiple servers on different versions at the same time.' },
+  { q: 'Which platforms and versions are supported?', a: `Vanilla, Paper, Spigot, Fabric and Forge (NeoForge on 26.x), from 1.8.8 up to the latest ${LATEST_VERSION} “${LATEST_DROP}” release. You can deploy multiple servers on different versions at the same time.` },
   { q: 'Can I install plugins and mods?', a: 'Absolutely. Paper and Spigot servers ship with a plugins folder you can manage from the built-in file manager, and Fabric / Forge servers get a mods folder with jar upload support.' },
   { q: 'What happens if my server crashes?', a: 'Every node runs a watchdog that restarts crashed servers automatically, and hourly backups mean you can roll back the world to any snapshot with one click from the panel.' },
   { q: 'Do I need to install anything on my PC?', a: 'No. CraftHost runs entirely in your browser — console, file manager, backups and metrics. Your friends just connect with the standard Minecraft launcher.' },

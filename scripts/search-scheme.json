@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.minecraft.net/article",
+    "name": "Minecraft new version numbering system",
+    "snippet": "Dec 2, 2025 — We're making changes to version numbering in Minecraft . Now the version number will be based on calendar year, e.g. “26” for 2026, ...",
+    "host_name": "www.minecraft.net",
+    "rank": 0,
+    "date": "Dec 2, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraftforum.net",
+    "name": "Please Don't Change the Minecraft Version Number Format",
+    "snippet": "Dec 13, 2025 — Changing it to something like \" 26.1 \" could make people think they missed versions like 2.0, 3.0, or even all the way up to 25.0 — even if those ...",
+    "host_name": "www.minecraftforum.net",
+    "rank": 1,
+    "date": "Dec 13, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.wiki/Java_Edition_26",
+    "name": "Java Edition 26.1",
+    "snippet": "7 days ago — 26.1, the release of Tiny Takeover , is a game drop for Java Edition released on March 24, 2026,[1] makes technical changes, and fixes bugs.",
+    "host_name": "minecraft.wiki",
+    "rank": 2,
+    "date": "Oct 4, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://feedback.minecraft.net/community/posts",
+    "name": "Revisit version numbering for parity",
+    "snippet": "Dec 2, 2025 — Java remains the same with 26.1 .1, 26.1 .2, etc to 26.2 . Bedrock maintains the same major version numbering but like so: 26.1 .10, 26.1 .11 ... Read more\nDec 2, 2025 — With the announcement on minecraft .net of the new update version numbering , there is still a major flaw that hasn't been solved. Read more",
+    "host_name": "feedback.minecraft.net",
+    "rank": 3,
+    "date": "Dec 2, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/tr-tr/article",
+    "name": "Minecraft new version numbering system",
+    "snippet": "Dec 2, 2025 — We're making changes to version numbering in Minecraft . Now the version number will be based on calendar year, e.g. “26” for 2026, ...",
+    "host_name": "www.minecraft.net",
+    "rank": 4,
+    "date": "Dec 2, 2025",
+    "favicon": ""
+  }
+]

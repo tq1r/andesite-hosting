@@ -84,34 +84,38 @@ interface SeedFile {
   children?: SeedFile[]
 }
 
-export async function seedFileTree(serverId: string, platform: string, propertiesText: string): Promise<void> {
+export async function seedFileTree(serverId: string, platform: string, version: string, propertiesText: string): Promise<void> {
+  // Mod jar names follow real naming conventions for the 26.x era (Oct 2026)
   const jars: Record<string, SeedFile[]> = {
     paper: [
-      { name: 'EssentialsX-2.20.1.jar', size: 2_186_112 },
-      { name: 'LuckPerms-5.4.150.jar', size: 10_489_523 },
-      { name: 'WorldEdit-7.3.0.jar', size: 2_528_256 },
+      { name: 'EssentialsX-2.21.0.jar', size: 2_204_672 },
+      { name: 'LuckPerms-5.5.5.jar', size: 10_782_720 },
+      { name: 'WorldEdit-7.4.0.jar', size: 2_572_288 },
     ],
     spigot: [
-      { name: 'EssentialsX-2.20.1.jar', size: 2_186_112 },
-      { name: 'Vault-1.7.3.jar', size: 425_984 },
+      { name: 'EssentialsX-2.21.0.jar', size: 2_204_672 },
+      { name: 'Vault-1.8.1.jar', size: 438_272 },
     ],
     fabric: [
-      { name: 'fabric-api-0.119.4.jar', size: 2_246_656 },
-      { name: 'lithium-fabric-0.14.4.jar', size: 487_424 },
-      { name: 'sodium-fabric-0.6.3.jar', size: 932_864 },
+      { name: `fabric-api-0.131.2+${version}.jar`, size: 2_310_144 },
+      { name: `lithium-fabric-0.16.2+${version}.jar`, size: 501_760 },
+      { name: `spark-1.10.98-fabric.jar`, size: 2_865_152 },
     ],
     forge: [
-      { name: 'jei-1.21.4-forge.jar', size: 1_284_096 },
-      { name: 'create-6.0.4-forge.jar', size: 24_117_248 },
+      { name: `jei-${version}-neoforge.jar`, size: 1_312_768 },
+      { name: `create-7.0.2-neoforge.jar`, size: 24_897_024 },
     ],
     vanilla: [],
   }
 
+  const ts = () => `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}:${pad(new Date().getSeconds())}`
   const logContent = [
-    `[${pad(new Date().getHours())}:${pad(new Date().getMinutes())}:${pad(new Date().getSeconds())}] [Server thread/INFO]: Starting minecraft server`,
-    `[${pad(new Date().getHours())}:${pad(new Date().getMinutes())}:${pad(new Date().getSeconds())}] [Server thread/INFO]: Loading properties`,
-    `[${pad(new Date().getHours())}:${pad(new Date().getMinutes())}:${pad(new Date().getSeconds())}] [Server thread/INFO]: Preparing level "world"`,
-    `[${pad(new Date().getHours())}:${pad(new Date().getMinutes())}:${pad(new Date().getSeconds())}] [Server thread/INFO]: Done (3.212s)! For help, type "help"`,
+    `[${ts()}] [ServerMain/INFO]: Loading Minecraft ${version} with Java 25.0.2`,
+    `[${ts()}] [ServerMain/INFO]: Loading server properties`,
+    `[${ts()}] [ServerMain/INFO]: Default game type: SURVIVAL`,
+    `[${ts()}] [Server thread/INFO]: Starting minecraft server version ${version}`,
+    `[${ts()}] [Server thread/INFO]: Preparing level "world"`,
+    `[${ts()}] [Server thread/INFO]: Done (3.212s)! For help, type "help"`,
   ].join('\n')
 
   const tree: SeedFile[] = [

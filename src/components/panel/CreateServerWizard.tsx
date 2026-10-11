@@ -19,8 +19,9 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { api } from '@/lib/api'
 import {
-  PLATFORMS, VERSIONS, REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES,
-  SERVER_NAME_IDEAS, PLANS, ramLabel, platformLabel, type ServerDTO,
+  PLATFORMS, REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES,
+  SERVER_NAME_IDEAS, PLANS, LATEST_VERSION, versionsForPlatform, ramLabel, platformLabel,
+  type ServerDTO,
 } from '@/lib/mc'
 import { useAppStore } from '@/lib/store'
 
@@ -57,7 +58,14 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
   const [step, setStep] = useState(1)
   const [name, setName] = useState(() => SERVER_NAME_IDEAS[Math.floor(Math.random() * SERVER_NAME_IDEAS.length)])
   const [platform, setPlatform] = useState<string>('paper')
-  const [version, setVersion] = useState('1.21.4')
+  const [version, setVersion] = useState(LATEST_VERSION)
+
+  const selectPlatform = (id: string) => {
+    setPlatform(id)
+    // keep version only if the new platform actually builds it
+    const allowed = versionsForPlatform(id).map((v) => v.id)
+    if (!allowed.includes(version)) setVersion(allowed[0])
+  }
   const [ramMb, setRamMb] = useState(prefillRamMb ?? 2048)
   const [maxPlayers, setMaxPlayers] = useState(20)
   const [region, setRegion] = useState('us-east')
@@ -134,7 +142,7 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
     <button
       key={p.id}
       type="button"
-      onClick={() => setPlatform(p.id)}
+      onClick={() => selectPlatform(p.id)}
       className={`rounded-lg border p-3 text-left transition-colors ${platform === p.id
         ? 'border-emerald-500/60 bg-emerald-500/10'
         : 'border-white/10 bg-white/[0.02] hover:border-white/25'}`}
@@ -194,9 +202,11 @@ function WizardBody({ prefillRamMb }: { prefillRamMb: number | null }) {
                 <SelectTrigger id="srv-version" className="bg-white/[0.03] border-white/10">
                   <SelectValue placeholder="Version" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-white/10">
-                  {VERSIONS.map((v) => (
-                    <SelectItem key={v.id} value={v.id}>{v.label}</SelectItem>
+                <SelectContent className="bg-zinc-950 border-white/10 max-h-72">
+                  {versionsForPlatform(platform).map((v) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.label}{v.note ? <span className="text-zinc-500"> — {v.note}</span> : null}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

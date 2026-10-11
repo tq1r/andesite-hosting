@@ -231,14 +231,16 @@ export class SimEngine {
     }
     const log = (lvl: LogLevel, msg: string, th = 'Server thread') => this.pushLog(rt, lvl, msg, th)
 
-    log('INFO', `Starting minecraft server version ${cfg.version}`)
-    after(320, () => log('INFO', 'Loading properties'))
-    after(560, () => log('INFO', `Default game type: ${cfg.gamemode.toUpperCase()}`))
+    // Boot sequence modeled on 26.x-era logs (Java 25 runtime, verified Oct 2026)
+    log('INFO', `Loading Minecraft ${cfg.version} with Java 25.0.2`, 'ServerMain')
+    after(280, () => log('INFO', 'Loading server properties', 'ServerMain'))
+    after(520, () => log('INFO', `Default game type: ${cfg.gamemode.toUpperCase()}`, 'ServerMain'))
+    after(700, () => log('INFO', `Starting minecraft server version ${cfg.version}`))
     if (cfg.platform !== 'vanilla') {
-      after(820, () => log('INFO', `This server is running ${platformLabel(cfg.platform)} version ${cfg.version}-214 (MC: ${cfg.version}) (Implementing API version ${cfg.version}-R0.1-SNAPSHOT)`))
+      after(950, () => log('INFO', `This server is running ${platformLabel(cfg.platform)} version ${cfg.version}-214 (MC: ${cfg.version}) (Implementing API version ${cfg.version}-R0.1-SNAPSHOT)`))
+      after(1200, () => log('INFO', 'Server permissions file permissions.yml is empty, defaulting to vanilla-style permissions'))
     }
-    after(1050, () => log('INFO', `Server permissions file permissions.yml is empty, defaulting to vanilla-style permissions`))
-    after(1250, () => log('INFO', `Preparing level "world"`))
+    after(1450, () => log('INFO', `Preparing level "world"`))
     after(1550, () => log('INFO', 'Preparing start region for dimension minecraft:overworld'))
     let area = 0
     const steps: Array<[number, number]> = [[350, 14], [650, 37], [950, 61], [1250, 83], [1500, 96]]

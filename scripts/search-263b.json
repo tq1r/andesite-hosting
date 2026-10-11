@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://feedback.minecraft.net/en-us/articles",
+    "name": "Minecraft Java Edition - 26.3 Pre-release 3",
+    "snippet": "Fixed bugs in 26.3 Pre-Release 3. Falling blocks disappear for a split second when landing. The post_effect debug overlay entry does. Changing the \"Exclusive ...",
+    "host_name": "feedback.minecraft.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/fi-fi/article",
+    "name": "Minecraft 26.3 Snapshot 3",
+    "snippet": "Jul 7, 2026 — Today's snapshot introduces two brand-new features coming to 26.3 : The Resource Pack version is now 91.0. Added posteffect Allows adding or ...",
+    "host_name": "www.minecraft.net",
+    "rank": 1,
+    "date": "Jul 7, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://he.minecraft.wiki",
+    "name": "Java Edition 26.3",
+    "snippet": "Sep 26, 2026 — 26.3 , יציאתו של Wilderness Bound, היא משחק עבור Java Edition שיצאה ב-15 בספטמבר 2026,אשר מוסיף את הביומה יער מנוקש, שיחים אדומים ופטריות מדף ... Read more",
+    "host_name": "he.minecraft.wiki",
+    "rank": 2,
+    "date": "Sep 26, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/sv-se/article",
+    "name": "Minecraft 26.3 Snapshot 4",
+    "snippet": "Jul 16, 2026 — We have also added new item components for custom furnace fuels , as well as several technical changes for signs, world generation and loot ... Read more",
+    "host_name": "www.minecraft.net",
+    "rank": 3,
+    "date": "Jul 16, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.minecraft.net/ja-jp/article",
+    "name": "Minecraft 26.3 Pre-Release 1",
+    "snippet": "Sep 1, 2026 — The first pre-release for 26.3 is here! There are technical changes, but we are now mainly fixing bugs, making improvements and putting on ... Read more",
+    "host_name": "www.minecraft.net",
+    "rank": 4,
+    "date": "Sep 1, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.wiki",
+    "name": "Minecraft 26.3 Snapshot 10 - Hebrew translation",
+    "snippet": "Aug 26, 2026 — Snapshot 26.3 Snapshot 10 (מוכר כ- 26.3 -snapshot-10 במשגר) הוא הסנאפשוט העשרי עבור Java Edition 26.3 , ששוחרר ב-25 באוגוסט 2026,[1] אשר משנה ...",
+    "host_name": "minecraft.wiki",
+    "rank": 5,
+    "date": "Aug 26, 2026",
+    "favicon": ""
+  }
+]
