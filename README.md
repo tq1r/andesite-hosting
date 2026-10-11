@@ -48,7 +48,7 @@ The dev gateway rewrites `/?XTransformPort=3003` to the engine so the panel's li
 
 The site deploys to Vercel out of the box:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fandesite-hosting%2Fandesite-hosting&project-name=andesite-hosting)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftq1r%2Fandesite-hosting&project-name=andesite-hosting)
 
 On serverless:
 
