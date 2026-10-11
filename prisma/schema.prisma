@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Server {
+  id         String    @id @default(cuid())
+  name       String
+  platform   String // vanilla | paper | spigot | fabric | forge
+  version    String
+  motd       String
+  maxPlayers Int       @default(20)
+  ramMb      Int       @default(2048)
+  port       Int
+  region     String    @default("us-east")
+  gamemode   String    @default("survival")
+  difficulty String    @default("normal")
+  worldType  String    @default("normal")
+  pvp        Boolean   @default(true)
+  onlineMode Boolean   @default(true)
+  whitelist  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  players    Player[]
+  files      FileNode[]
+  backups    Backup[]
+}
+
+model Player {
+  id            String   @id @default(cuid())
+  serverId      String
+  server        Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name          String
+  uuid          String
+  isOp          Boolean  @default(false)
+  isBanned      Boolean  @default(false)
+  isWhitelisted Boolean  @default(false)
+  joins         Int      @default(0)
+  playTimeMin   Int      @default(0)
+  lastSeen      DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@unique([serverId, name])
+}
+
+model FileNode {
+  id        String   @id @default(cuid())
+  serverId  String
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  parentId  String?
+  name      String
+  isDir     Boolean  @default(false)
+  content   String?
+  size      Int      @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([serverId, parentId])
+}
+
+model Backup {
+  id        String   @id @default(cuid())
+  serverId  String
+  server    Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name      String
+  sizeMb    Float    @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  type       String // created | deleted | settings | backup | restore | player | wizard
+  message    String
+  serverId   String?
+  serverName String?
+  createdAt  DateTime @default(now())
+}

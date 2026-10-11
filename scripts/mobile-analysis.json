@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Yes, the layout is responsive and usable. All elements, including the header, server info, action buttons, and tab navigation, fit within the 390px width without any horizontal overflow or cut-off content. The design effectively uses a vertical stack and grid layout to ensure all interactive elements remain accessible on mobile.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1791681885,
+  "id": "20261011092443284f2a76dac94d92",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261011092443284f2a76dac94d92",
+  "usage": {
+    "completion_tokens": 64,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 440,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 504
+  }
+}
