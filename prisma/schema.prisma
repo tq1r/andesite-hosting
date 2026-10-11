@@ -8,26 +8,27 @@ datasource db {
 }
 
 model Server {
-  id         String    @id @default(cuid())
+  id         String      @id @default(cuid())
   name       String
   platform   String // vanilla | paper | spigot | fabric | forge
   version    String
   motd       String
-  maxPlayers Int       @default(20)
-  ramMb      Int       @default(2048)
+  maxPlayers Int         @default(20)
+  ramMb      Int         @default(2048)
   port       Int
-  region     String    @default("us-east")
-  gamemode   String    @default("survival")
-  difficulty String    @default("normal")
-  worldType  String    @default("normal")
-  pvp        Boolean   @default(true)
-  onlineMode Boolean   @default(true)
-  whitelist  Boolean   @default(false)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  region     String      @default("us-east")
+  gamemode   String      @default("survival")
+  difficulty String      @default("normal")
+  worldType  String      @default("normal")
+  pvp        Boolean     @default(true)
+  onlineMode Boolean     @default(true)
+  whitelist  Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   players    Player[]
   files      FileNode[]
   backups    Backup[]
+  schedules  Schedule[]
 }
 
 model Player {
@@ -73,9 +74,23 @@ model Backup {
 
 model Activity {
   id         String   @id @default(cuid())
-  type       String // created | deleted | settings | backup | restore | player | wizard
+  type       String // created | deleted | settings | backup | restore | player | wizard | plugin | schedule | reinstall
   message    String
   serverId   String?
   serverName String?
   createdAt  DateTime @default(now())
+}
+
+model Schedule {
+  id         String    @id @default(cuid())
+  serverId   String
+  server     Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name       String
+  everyMin   Int       @default(360)
+  action     String // backup | restart | command
+  payload    String? // command text when action = command
+  enabled    Boolean   @default(true)
+  lastRunAt  DateTime?
+  lastResult String?
+  createdAt  DateTime  @default(now())
 }

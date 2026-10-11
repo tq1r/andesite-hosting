@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { getEngineStatuses, FALLBACK_STATUS, notifyEngineServerDeleted } from '@/lib/engine'
-import { genProperties } from '@/lib/seed'
+import { getEngineStatuses, FALLBACK_STATUS, notifyEngineServerDeleted, syncSchedules } from '@/lib/engine'
+import { genProperties, serverPluginNames } from '@/lib/seed'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,11 +31,13 @@ export async function GET(_req: Request, ctx: Ctx) {
   if (!server) return NextResponse.json({ error: 'Server not found' }, { status: 404 })
   const statuses = await getEngineStatuses()
   const st = statuses[id] ?? FALLBACK_STATUS
+  const plugins = await serverPluginNames(id)
   return NextResponse.json({
     server: {
       ...server,
       playerCount: server._count.players,
       backupCount: server._count.backups,
+      plugins,
       status: st.status,
       playersOnline: st.playersOnline,
       uptimeSec: st.uptimeSec,
@@ -94,6 +96,7 @@ export async function DELETE(_req: Request, ctx: Ctx) {
 
   await notifyEngineServerDeleted(id)
   await db.server.delete({ where: { id } })
+  await syncSchedules()
   await db.activity.create({
     data: {
       type: 'deleted',

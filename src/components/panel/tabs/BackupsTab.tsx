@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { HardDriveDownload, Plus, RotateCcw, Trash2, Package } from 'lucide-react'
+import { HardDriveDownload, Plus, RotateCcw, Trash2, Package, Download } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -58,6 +58,28 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
     },
   })
 
+  const downloadBackup = (b: BackupDTO) => {
+    // demo panels keep snapshots server-side; the button exports a manifest
+    const manifest = {
+      backup: b.name,
+      server: server.name,
+      created: b.createdAt,
+      sizeMb: b.sizeMb,
+      contents: ['world/level.dat', 'world/region/*.mca', 'world/playerdata/*.dat', 'plugins/*', 'server.properties'],
+      note: 'Full .zip archives download over SFTP — see Settings → SFTP access.',
+    }
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${b.name.replace(/[^a-z0-9_-]+/gi, '_')}_manifest.json`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    toast({ title: 'Manifest downloaded', description: 'Full archives are served over SFTP.' })
+  }
+
   return (
     <div className="space-y-4 max-w-3xl">
       <Card className="bg-white/[0.02] border-white/5">
@@ -110,6 +132,13 @@ export function BackupsTab({ server }: { server: ServerDTO }) {
                       {format(new Date(b.createdAt), 'MMM d, yyyy HH:mm')} · {b.sizeMb} MB
                     </p>
                   </div>
+                  <Button
+                    size="sm" variant="ghost" onClick={() => downloadBackup(b)}
+                    className="h-8 w-8 p-0 text-zinc-500 hover:text-emerald-300 hover:bg-emerald-500/10"
+                    aria-label={`Download ${b.name}`}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => setRestoreTarget(b)} className="border-white/10 hover:bg-white/5 h-8">
                     <RotateCcw className="mr-1 h-3.5 w-3.5 text-amber-300" /> Restore
                   </Button>

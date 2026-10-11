@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://modrinth.com",
+    "name": "Server Optimiser V2 - Minecraft Plugin",
+    "snippet": "ServerOptimiser v2 - Intelligent Performance Management . Transform your server's performance with smart TPS control and comprehensive optimization. Read more",
+    "host_name": "modrinth.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://minecraft.how",
+    "name": "MCSManager: How to Control Multiple Minecraft Servers",
+    "snippet": "Apr 24, 2026 — MCSManager is a free web panel for managing multiple Minecraft servers from one dashboard. Deploy, monitor, and control servers with ease.",
+    "host_name": "minecraft.how",
+    "rank": 1,
+    "date": "Apr 24, 2026",
+    "favicon": ""
+  }
+]

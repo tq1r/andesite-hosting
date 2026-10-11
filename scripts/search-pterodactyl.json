@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://github.com",
+    "name": "Make S3 part size configurable for backups to prevent 504",
+    "snippet": "Sep 5, 2022 — Make S3 part size configurable for backups to prevent 504 errors · Issue #4361 · pterodactyl / panel ... Backup files are working as expected. Read more",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "Sep 5, 2022",
+    "favicon": ""
+  },
+  {
+    "url": "https://builtbybit.com",
+    "name": "Pterodactyl [v0.7] Addon - Backup System (Backup for clients)",
+    "snippet": "This is an addon for Pterodactyl Panel [v0.7] Description: One click backup make. This addon make zip file from server and you can download, restore it with ... Read more",
+    "host_name": "builtbybit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  }
+]

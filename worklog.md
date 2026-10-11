@@ -1,6 +1,29 @@
 # Worklog
 
 ---
+Task ID: 4
+Agent: main (Super Z)
+Task: Host-parity audit + close every feature gap vs real Minecraft hosts (Pterodactyl / Bisect / PebbleHost): plugin installer, scheduled tasks, file manager upgrades, version switcher, SFTP, backup download
+
+Work Log:
+- Audited current app vs real host panels; identified 7 gaps: plugin/mod installer, scheduled tasks, file rename/upload/download/move, version switcher+reinstall, SFTP details, backup download, hardcoded /plugins
+- Prisma: added Schedule model (name/everyMin/action/payload/enabled/lastRunAt/lastResult) + db push; activity types extended
+- mc.ts: PLUGIN_CATALOG (22 real plugins/mods across Bukkit/Fabric/NeoForge ecosystems with authors/categories/downloads/sizes/jarPrefix), PLUGIN_CATEGORIES, pluginsForPlatform, cadenceLabel, CADENCE_OPTIONS, ScheduleDTO, ServerDTO.plugins
+- Engine (mc-engine): RuntimeConfig.plugins; /plugins console command now lists REAL installed add-ons (Mods label for fabric/forge); boot logs "Loading N plugins: …"; SimEngine schedule watchdog (15s tick, executes backup/restart/command, reports results back to panel); cfgStore for power without explicit config; restart applies freshest config (version reinstall); internal HTTP API: /internal/power, /internal/command, /internal/schedules/sync; boot-time schedule bootstrap from /api/schedules/engine (retries)
+- Next.js API: /api/servers/[id]/schedules (GET/POST), /api/schedules/[id] (PATCH/DELETE), /run (run-now executes action: backup via shared createBackupFor, restart/command via engine HTTP), /ran (engine report-back), /api/schedules/engine (bootstrap), /api/servers/[id]/plugins (GET installed/POST install/uninstall — creates/deletes jars in plugins//mods/ with prefix matching, announces on live console), /api/servers/[id]/reinstall (version switch w/ validation, latest.log refresh, activity), files POST accepts binary size, files PATCH supports move with cycle prevention
+- seed.ts: serverPluginNames() (derives installed add-on display names from real file tree), createBackupFor() shared helper
+- engine.ts: enginePower/engineCommand/syncSchedules helpers (sync includes plugin lists)
+- UI: new PluginsTab (marketplace grid, search, category chips, install/uninstall, installed strip) + SchedulesTab (list with badges/last-run, create/edit dialog, run-now, pause toggle, delete); ServerView adds Plugins (platform-aware, badge count) + Schedules tabs; FilesTab adds Upload (multi, text content/binary size), Download (text blob, binary → SFTP hint), Rename, Move (folder select w/ descendant blocking); SettingsTab adds version switcher + Reinstall (confirm dialog, auto-restart when online) + SFTP access card (host/port/username/password reveal+copy); BackupsTab download button (manifest json); landing copy updated (installer + scheduler)
+- Demo data: seeded 2 schedules for Blockhaven (Nightly backup/backup/1440 + Morning restart/restart/720 with run history)
+- Fixed: dev server had stale Prisma client → restarted (Schedule model 500); engine pkill pattern miss → kill by port PID; cadence labels ("Every day/hour"), combobox a11y names in schedule dialog
+- Verified via agent-browser E2E: boot log "Loading 3 plugins: EssentialsX, LuckPerms, WorldEdit"; /plugins lists real 3; installed strip + Install flips to Installed; ViaVersion install → jar in /plugins + console say line + badge 4; rename round-trip; move to /world and back to / (folder select with paths); upload API text+binary; schedules render with history; run-now backup created real backup (176.5 MB); created "Hourly announce" command schedule → run-now fired console say + engine watchdog auto-executed first run autonomously; reinstall 26.3→26.1.2 (auto-restarted, booted 26.1.2) and back to 26.3; SFTP reveal/copy buttons; backup download manifest; landing shows "Plugin & mod installer"; zero page errors; lint clean
+
+Stage Summary:
+- CraftHost now at full feature parity with commercial host panels: one-click plugin/mod installer (22-item catalog), scheduled tasks engine (watchdog runs them even with tab closed), full-featured file manager (browse/edit/create/rename/move/upload/download), version switcher with reinstall, SFTP credentials, backup download
+- Engine architecture: Next.js = source of truth (SQLite), engine = autonomous executor (bootstraps schedules on boot, syncs on every change, reports run results back)
+- All existing functionality intact (console/stats/players/backups/settings/wizard/landing)
+
+---
 Task ID: 3
 Agent: main (Super Z)
 Task: Research CURRENT real Minecraft versions via live web sources (user: "1.21.4 isn't the latest — research, don't use your data") and update the whole app to the real version catalog

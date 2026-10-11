@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, AlertTriangle, Trash2, Swords, KeyRound, ListChecks } from 'lucide-react'
+import { Save, AlertTriangle, Trash2, Swords, KeyRound, ListChecks, RotateCw, TerminalSquare, Copy, Eye, EyeOff } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,9 +19,10 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { api, sendCommand } from '@/lib/api'
 import {
-  REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES,
+  REGIONS, GAMEMODES, DIFFICULTIES, WORLD_TYPES, versionsForPlatform,
   ramLabel, platformLabel, versionLabel, type ServerDTO,
 } from '@/lib/mc'
+import { powerAction } from '@/lib/api'
 import { useAppStore } from '@/lib/store'
 
 export function SettingsTab({ server }: { server: ServerDTO }) {
@@ -41,6 +42,9 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
   const [onlineMode, setOnlineMode] = useState(server.onlineMode)
   const [whitelist, setWhitelist] = useState(server.whitelist)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [reinstallVersion, setReinstallVersion] = useState(server.version)
+  const [confirmReinstall, setConfirmReinstall] = useState(false)
+  const [showSftpPass, setShowSftpPass] = useState(false)
 
   // resync when server prop changes (e.g. after refetch)
   useEffect(() => {
@@ -55,6 +59,7 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
     setPvp(server.pvp)
     setOnlineMode(server.onlineMode)
     setWhitelist(server.whitelist)
+    setReinstallVersion(server.version)
   }, [server])
 
   const dirty =
@@ -87,6 +92,40 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
       toast({ title: 'Server deleted', description: `${server.name} has been removed.` })
     },
   })
+
+  const reinstallMutation = useMutation({
+    mutationFn: () =>
+      api<{ previousVersion: string }>(`/api/servers/${server.id}/reinstall`, {
+        method: 'POST',
+        body: JSON.stringify({ version: reinstallVersion }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['servers'] })
+      queryClient.invalidateQueries({ queryKey: ['server', server.id] })
+      queryClient.invalidateQueries({ queryKey: ['activity'] })
+      queryClient.invalidateQueries({ queryKey: ['files', server.id] })
+      setConfirmReinstall(false)
+      toast({
+        title: `Reinstalled on ${reinstallVersion}`,
+        description: server.status === 'online'
+          ? 'Restarting the server on the new core…'
+          : 'The new core loads on next boot. World and add-ons were kept.',
+      })
+      if (server.status === 'online') {
+        powerAction({ ...server, version: reinstallVersion }, 'restart')
+      }
+    },
+    onError: (e) => toast({ title: 'Reinstall failed', description: e.message, variant: 'destructive' }),
+  })
+
+  const copyText = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      toast({ title: `${label} copied` })
+    } catch {
+      toast({ title: 'Copy failed', variant: 'destructive' })
+    }
+  }
 
   const save = () =>
     saveMutation.mutate({
@@ -131,9 +170,32 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
             </div>
             <div className="space-y-2">
               <Label>Version</Label>
-              <div className="rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 text-sm text-zinc-400">
-                {versionLabel(server.version)} — reinstall required to change
+              <div className="flex gap-2">
+                <Select value={reinstallVersion} onValueChange={setReinstallVersion}>
+                  <SelectTrigger className="bg-white/[0.03] border-white/10 flex-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-950 border-white/10 max-h-72">
+                    {versionsForPlatform(server.platform).map((v) => (
+                      <SelectItem key={v.id} value={v.id}>
+                        {v.label}{v.note ? <span className="text-zinc-500"> — {v.note}</span> : null}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  disabled={reinstallVersion === server.version || reinstallMutation.isPending}
+                  onClick={() => setConfirmReinstall(true)}
+                  className="border-white/10 hover:bg-white/5 shrink-0"
+                >
+                  <RotateCw className="mr-1.5 h-4 w-4 text-amber-300" />
+                  {reinstallMutation.isPending ? 'Reinstalling…' : 'Reinstall'}
+                </Button>
               </div>
+              <p className="text-[11px] text-zinc-600">
+                Switching cores keeps the world, backups, add-ons and settings. Currently on {versionLabel(server.version)}.
+              </p>
             </div>
           </div>
         </CardContent>
@@ -248,6 +310,69 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
         </CardContent>
       </Card>
 
+      {/* SFTP access */}
+      <Card className="bg-white/[0.02] border-white/5">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-sm font-medium text-zinc-300 flex items-center gap-1.5">
+            <TerminalSquare className="h-4 w-4 text-emerald-400" /> SFTP access
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-zinc-500">
+            Full file access from any FTP client — FileZilla, WinSCP, Cyberduck. SFTP only; plain FTP is disabled for security.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {([
+              { label: 'Host', value: 'sftp.crafthost.gg', mono: true },
+              { label: 'Port', value: '2022', mono: true },
+              {
+                label: 'Username',
+                value: `${server.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 20) || 'server'}.${server.id.slice(0, 6)}`,
+                mono: true,
+              },
+            ] as const).map((row) => (
+              <div key={row.label} className="rounded-md border border-white/10 bg-white/[0.02] px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wide text-zinc-600">{row.label}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[13px] text-zinc-300 truncate">{row.value}</span>
+                  <button
+                    onClick={() => copyText(row.label, row.value)}
+                    className="shrink-0 rounded p-1 text-zinc-600 hover:text-emerald-300 hover:bg-white/10"
+                    aria-label={`Copy ${row.label}`}
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            <div className="rounded-md border border-white/10 bg-white/[0.02] px-3 py-2 sm:col-span-2">
+              <p className="text-[10px] uppercase tracking-wide text-zinc-600">Password</p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[13px] text-zinc-300 truncate">
+                  {showSftpPass ? `ch-${server.port}-${server.id.slice(-6)}` : '••••••••••••••••'}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => setShowSftpPass((v) => !v)}
+                    className="rounded p-1 text-zinc-600 hover:text-zinc-200 hover:bg-white/10"
+                    aria-label={showSftpPass ? 'Hide password' : 'Show password'}
+                  >
+                    {showSftpPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                  <button
+                    onClick={() => copyText('Password', `ch-${server.port}-${server.id.slice(-6)}`)}
+                    className="rounded p-1 text-zinc-600 hover:text-emerald-300 hover:bg-white/10"
+                    aria-label="Copy password"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Danger zone */}
       <Card className="border-red-500/20 bg-red-500/[0.03]">
         <CardHeader className="pb-3">
@@ -264,6 +389,29 @@ export function SettingsTab({ server }: { server: ServerDTO }) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* reinstall confirm */}
+      <AlertDialog open={confirmReinstall} onOpenChange={setConfirmReinstall}>
+        <AlertDialogContent className="bg-zinc-950 border-white/10">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reinstall {server.name} on {reinstallVersion}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The {platformLabel(server.platform)} core will be swapped to {reinstallVersion} (currently {server.version}).
+              Your world, backups, {server.platform === 'fabric' || server.platform === 'forge' ? 'mods' : 'plugins'} and settings are preserved.
+              {server.status === 'online' && ' The server will restart automatically.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/10">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reinstallMutation.mutate()}
+              className="bg-amber-500 text-zinc-950 hover:bg-amber-400"
+            >
+              <RotateCw className="mr-1.5 h-4 w-4" /> Reinstall on {reinstallVersion}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent className="bg-zinc-950 border-white/10">

@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Folder, FileText, FileJson, FileCog, Package, FileArchive, Database,
   ChevronRight, FolderPlus, FilePlus, Trash2, Save, Home, Binary,
+  Upload, Download, Pencil, FolderInput, Loader2,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { api } from '@/lib/api'
 import { sizeLabel, type FileNodeDTO, type ServerDTO } from '@/lib/mc'
@@ -49,6 +53,11 @@ export function FilesTab({ server }: { server: ServerDTO }) {
   const [deleteTarget, setDeleteTarget] = useState<FileNodeDTO | null>(null)
   const [createDialog, setCreateDialog] = useState<'file' | 'folder' | null>(null)
   const [createName, setCreateName] = useState('')
+  const [renameTarget, setRenameTarget] = useState<FileNodeDTO | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [moveTarget, setMoveTarget] = useState<FileNodeDTO | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const uploadRef = useRef<HTMLInputElement>(null)
 
   const { data: files = [], isLoading } = useQuery({
     queryKey: ['files', server.id],
@@ -68,10 +77,29 @@ export function FilesTab({ server }: { server: ServerDTO }) {
     return crumbs
   }, [currentDir, byId])
 
-  const items = useMemo(
-    () => files.filter((f) => (f.parentId ?? null) === (currentDirId ?? null)),
-    [files, currentDirId]
-  )
+  const folderOptions = useMemo(() => {
+    if (!moveTarget) return []
+    // exclude the moved folder itself + its descendants
+    const blocked = new Set<string>([moveTarget.id])
+    let frontier = [moveTarget.id]
+    while (frontier.length) {
+      const kids = files.filter((f) => f.parentId && frontier.includes(f.parentId)).map((f) => f.id)
+      kids.forEach((k) => blocked.add(k))
+      frontier = kids
+    }
+    const pathOf = (f: FileNodeDTO): string => {
+      const parts: string[] = []
+      let node: FileNodeDTO | undefined = f
+      while (node) {
+        parts.unshift(node.name)
+        node = node.parentId ? byId.get(node.parentId) : undefined
+      }
+      return '/' + parts.join('/')
+    }
+    return files
+      .filter((f) => f.isDir && !blocked.has(f.id))
+      .map((d) => ({ id: d.id, label: pathOf(d) }))
+  }, [files, byId, moveTarget])
 
   const refetch = () => {
     queryClient.invalidateQueries({ queryKey: ['files', server.id] })
@@ -111,6 +139,81 @@ export function FilesTab({ server }: { server: ServerDTO }) {
     },
   })
 
+  const renameMutation = useMutation({
+    mutationFn: (f: FileNodeDTO) =>
+      api(`/api/files/${f.id}`, { method: 'PATCH', body: JSON.stringify({ name: renameValue.trim() }) }),
+    onSuccess: (_d, f) => {
+      refetch()
+      setRenameTarget(null)
+      toast({ title: 'Renamed', description: `${f.name} → ${renameValue.trim()}` })
+    },
+    onError: (e) => toast({ title: 'Rename failed', description: e.message, variant: 'destructive' }),
+  })
+
+  const moveMutation = useMutation({
+    mutationFn: ({ f, parentId }: { f: FileNodeDTO; parentId: string | null }) =>
+      api(`/api/files/${f.id}`, { method: 'PATCH', body: JSON.stringify({ parentId }) }),
+    onSuccess: () => {
+      refetch()
+      setMoveTarget(null)
+      toast({ title: 'Moved', description: 'The item now lives in its new folder.' })
+    },
+    onError: (e) => toast({ title: 'Move failed', description: e.message, variant: 'destructive' }),
+  })
+
+  const onUpload = async (list: FileList | null) => {
+    if (!list?.length) return
+    setUploading(true)
+    let ok = 0
+    let fail = 0
+    for (const f of Array.from(list)) {
+      try {
+        const lower = f.name.toLowerCase()
+        const textLike = (f.type.startsWith('text/') || TEXT_EXTS.some((e) => lower.endsWith(e))) && f.size < 200_000
+        const body: Record<string, unknown> = { parentId: currentDirId, name: f.name, isDir: false }
+        if (textLike) body.content = await f.text()
+        else body.size = f.size
+        await api(`/api/servers/${server.id}/files`, { method: 'POST', body: JSON.stringify(body) })
+        ok++
+      } catch {
+        fail++
+      }
+    }
+    setUploading(false)
+    if (uploadRef.current) uploadRef.current.value = ''
+    refetch()
+    toast({
+      title: `Uploaded ${ok} file${ok !== 1 ? 's' : ''}`,
+      description: fail ? `${fail} failed — name clash or too large.` : undefined,
+      variant: fail && !ok ? 'destructive' : undefined,
+    })
+  }
+
+  const download = (f: FileNodeDTO) => {
+    if (f.isDir) {
+      toast({ title: 'Folder download', description: 'World folders are served over SFTP — see Settings → SFTP access.' })
+      return
+    }
+    if (f.content == null) {
+      toast({ title: 'Binary file', description: `${f.name} (${sizeLabel(f.size)}) is served over SFTP — see Settings.` })
+      return
+    }
+    const blob = new Blob([f.content], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = f.name
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  const items = useMemo(
+    () => files.filter((f) => (f.parentId ?? null) === (currentDirId ?? null)),
+    [files, currentDirId]
+  )
+
   const openEditor = (f: FileNodeDTO) => {
     setOpenFile(f)
     setEditContent(f.content ?? '')
@@ -138,6 +241,24 @@ export function FilesTab({ server }: { server: ServerDTO }) {
             ))}
           </div>
           <div className="ml-auto flex items-center gap-1.5">
+            <input
+              ref={uploadRef}
+              type="file"
+              multiple
+              className="hidden"
+              onChange={(e) => onUpload(e.target.files)}
+              aria-hidden
+              tabIndex={-1}
+            />
+            <Button
+              size="sm" variant="outline"
+              onClick={() => uploadRef.current?.click()}
+              disabled={uploading}
+              className="border-white/10 hover:bg-white/5 h-8"
+            >
+              {uploading ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin text-emerald-400" /> : <Upload className="mr-1 h-3.5 w-3.5 text-emerald-400" />}
+              <span className="hidden sm:inline">{uploading ? 'Uploading…' : 'Upload'}</span>
+            </Button>
             <Button size="sm" variant="outline" onClick={() => setCreateDialog('folder')} className="border-white/10 hover:bg-white/5 h-8">
               <FolderPlus className="mr-1 h-3.5 w-3.5 text-emerald-400" /> <span className="hidden sm:inline">Folder</span>
             </Button>
@@ -184,13 +305,36 @@ export function FilesTab({ server }: { server: ServerDTO }) {
                     <span className="hidden lg:block text-[11px] text-zinc-600 w-28 text-right shrink-0">
                       {new Date(f.updatedAt).toLocaleDateString()}
                     </span>
-                    <button
-                      onClick={() => setDeleteTarget(f)}
-                      className="rounded-md p-1.5 text-zinc-600 opacity-0 group-hover:opacity-100 hover:bg-red-500/15 hover:text-red-400 transition-all focus:opacity-100"
-                      aria-label={`Delete ${f.name}`}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <button
+                        onClick={() => download(f)}
+                        className="rounded-md p-1.5 text-zinc-600 opacity-0 group-hover:opacity-100 hover:bg-white/10 hover:text-zinc-200 transition-all focus:opacity-100"
+                        aria-label={`Download ${f.name}`}
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => (setRenameTarget(f), setRenameValue(f.name))}
+                        className="rounded-md p-1.5 text-zinc-600 opacity-0 group-hover:opacity-100 hover:bg-white/10 hover:text-zinc-200 transition-all focus:opacity-100"
+                        aria-label={`Rename ${f.name}`}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setMoveTarget(f)}
+                        className="rounded-md p-1.5 text-zinc-600 opacity-0 group-hover:opacity-100 hover:bg-white/10 hover:text-zinc-200 transition-all focus:opacity-100"
+                        aria-label={`Move ${f.name}`}
+                      >
+                        <FolderInput className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(f)}
+                        className="rounded-md p-1.5 text-zinc-600 opacity-0 group-hover:opacity-100 hover:bg-red-500/15 hover:text-red-400 transition-all focus:opacity-100"
+                        aria-label={`Delete ${f.name}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </li>
                 )
               })}
@@ -274,6 +418,67 @@ export function FilesTab({ server }: { server: ServerDTO }) {
               Create
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* rename dialog */}
+      <Dialog open={!!renameTarget} onOpenChange={(o) => !o && setRenameTarget(null)}>
+        <DialogContent className="max-w-sm bg-zinc-950 border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Rename “{renameTarget?.name}”</DialogTitle>
+            <DialogDescription className="sr-only">Enter a new name</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="rename-value">New name</Label>
+            <Input
+              id="rename-value"
+              value={renameValue}
+              maxLength={64}
+              onChange={(e) => setRenameValue(e.target.value)}
+              className="bg-white/[0.03] border-white/10 font-mono"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && renameValue.trim() && renameTarget) renameMutation.mutate(renameTarget)
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setRenameTarget(null)} className="text-zinc-400">Cancel</Button>
+            <Button
+              disabled={!renameValue.trim() || renameMutation.isPending}
+              onClick={() => renameTarget && renameMutation.mutate(renameTarget)}
+              className="bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-semibold"
+            >
+              Rename
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* move dialog */}
+      <Dialog open={!!moveTarget} onOpenChange={(o) => !o && setMoveTarget(null)}>
+        <DialogContent className="max-w-sm bg-zinc-950 border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Move “{moveTarget?.name}”</DialogTitle>
+            <DialogDescription>Pick a destination folder</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="move-dest">Destination</Label>
+            <Select
+              value=""
+              onValueChange={(v) => moveTarget && moveMutation.mutate({ f: moveTarget, parentId: v === '__root__' ? null : v })}
+            >
+              <SelectTrigger id="move-dest" className="bg-white/[0.03] border-white/10 font-mono text-xs">
+                <SelectValue placeholder="Choose a folder…" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-950 border-white/10 max-h-64">
+                <SelectItem value="__root__" className="font-mono">/ (root)</SelectItem>
+                {folderOptions.map((o) => (
+                  <SelectItem key={o.id} value={o.id} className="font-mono">{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-zinc-600">Moving is instant — the panel just updates the path.</p>
+          </div>
         </DialogContent>
       </Dialog>
 

@@ -35,7 +35,20 @@ export interface RuntimeConfig {
   port: number
   gamemode: string
   difficulty: string
+  plugins?: string[] // display names of installed plugins/mods
 }
+
+export interface EngineSchedule {
+  id: string
+  serverId: string
+  everyMin: number
+  action: 'backup' | 'restart' | 'command'
+  payload: string | null
+  enabled: boolean
+  lastRunAt: number // epoch ms (0 = never ran)
+}
+
+const NEXT_URL = 'http://localhost:3000'
 
 export interface EngineStatusInfo {
   status: ServerStatus
@@ -128,24 +141,41 @@ export interface EngineHooks {
 
 export class SimEngine {
   private runtimes = new Map<string, Runtime>()
-  constructor(private hooks: EngineHooks) {}
+  private cfgStore = new Map<string, RuntimeConfig>()
+  private schedules: EngineSchedule[] = []
+  constructor(private hooks: EngineHooks) {
+    // schedule watchdog — checks every 15s whether a task is due
+    setInterval(() => this.tickSchedules(), 15_000)
+  }
+
+  setSchedules(schedules: EngineSchedule[], cfgs: Record<string, RuntimeConfig>) {
+    this.schedules = schedules
+    for (const [id, cfg] of Object.entries(cfgs)) this.cfgStore.set(id, cfg)
+  }
 
   // ─── Public API ────────────────────────────────────────────────────────────
 
   power(serverId: string, action: 'start' | 'stop' | 'restart' | 'kill', cfg?: RuntimeConfig) {
     const rt = this.runtimes.get(serverId)
+    const useCfg = cfg ?? this.cfgStore.get(serverId)
     if (action === 'kill') {
       if (rt) this.kill(rt)
       return
     }
     if (action === 'start') {
       if (rt && rt.status !== 'offline') return
-      this.start(cfg!)
+      if (!useCfg) return
+      this.start(useCfg)
       return
     }
     if (action === 'restart') {
+      // apply the freshest config (e.g. after a version reinstall)
+      if (cfg) {
+        this.cfgStore.set(serverId, cfg)
+        if (rt) rt.cfg = cfg
+      }
       if (!rt || rt.status === 'offline') {
-        if (cfg) this.start(cfg)
+        if (useCfg) this.start(useCfg)
         return
       }
       rt.restartAfterStop = true
@@ -224,6 +254,7 @@ export class SimEngine {
       destroyed: false,
     }
     this.runtimes.set(cfg.id, rt)
+    this.cfgStore.set(cfg.id, cfg)
     this.hooks.broadcastStatus(cfg.id)
 
     const after = (ms: number, fn: () => void) => {
@@ -239,6 +270,10 @@ export class SimEngine {
     if (cfg.platform !== 'vanilla') {
       after(950, () => log('INFO', `This server is running ${platformLabel(cfg.platform)} version ${cfg.version}-214 (MC: ${cfg.version}) (Implementing API version ${cfg.version}-R0.1-SNAPSHOT)`))
       after(1200, () => log('INFO', 'Server permissions file permissions.yml is empty, defaulting to vanilla-style permissions'))
+    }
+    if (cfg.plugins?.length) {
+      const isMod = cfg.platform === 'fabric' || cfg.platform === 'forge'
+      after(1300, () => log('INFO', `Loading ${cfg.plugins!.length} ${isMod ? 'mods' : 'plugins'}: ${cfg.plugins!.join(', ')}`))
     }
     after(1450, () => log('INFO', `Preparing level "world"`))
     after(1550, () => log('INFO', 'Preparing start region for dimension minecraft:overworld'))
@@ -565,10 +600,18 @@ export class SimEngine {
       case 'tps':
         log('INFO', `TPS from last 1m, 5m, 15m: ${(rnd(19.7, 20)).toFixed(2)}, ${(rnd(19.6, 20)).toFixed(2)}, ${(rnd(19.5, 20)).toFixed(2)}`)
         break
-      case 'plugins': case 'pl':
+      case 'plugins': case 'pl': {
         if (!supportsPlugins(rt.cfg.platform)) { log('WARN', 'This server does not support plugins (vanilla). Try Fabric or Forge for mods.'); break }
-        log('INFO', `Plugins (3): EssentialsX, LuckPerms, WorldEdit`)
+        const isMod = rt.cfg.platform === 'fabric' || rt.cfg.platform === 'forge'
+        const label = isMod ? 'Mods' : 'Plugins'
+        const list = rt.cfg.plugins ?? []
+        if (!list.length) {
+          log('INFO', `${label} (0) — install some from the ${label} tab in the panel`)
+        } else {
+          log('INFO', `${label} (${list.length}): ${list.join(', ')}`)
+        }
         break
+      }
       case 'version': case 'about':
         log('INFO', rt.cfg.platform === 'vanilla'
           ? `This server is running vanilla version ${rt.cfg.version}`
@@ -580,5 +623,53 @@ export class SimEngine {
       default:
         log('ERROR', `Unknown command. Type "help" for help.`)
     }
+  }
+
+  // ─── Scheduled tasks ──────────────────────────────────────────────────────
+
+  private tickSchedules() {
+    const now = Date.now()
+    for (const s of this.schedules) {
+      if (!s.enabled) continue
+      if (now - s.lastRunAt < s.everyMin * 60_000) continue
+      s.lastRunAt = now // mark immediately to avoid double-fire
+      this.executeSchedule(s)
+        .then((result) => this.reportScheduleRun(s.id, now, result))
+        .catch(() => this.reportScheduleRun(s.id, now, 'failed'))
+    }
+  }
+
+  private async executeSchedule(s: EngineSchedule): Promise<string> {
+    const rt = this.runtimes.get(s.serverId)
+    if (s.action === 'restart') {
+      if (!rt || rt.status === 'offline') return 'skipped — server offline'
+      rt.restartAfterStop = true
+      this.stop(rt, 'Scheduled restart — Stopping the server')
+      return 'server restarted'
+    }
+    if (s.action === 'command') {
+      if (!rt || rt.status !== 'online') return 'skipped — server offline'
+      this.command(s.serverId, s.payload ?? 'say Scheduled task')
+      return `ran "${s.payload}"`
+    }
+    // backup
+    const d = new Date()
+    const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`
+    const res = await fetch(`${NEXT_URL}/api/servers/${s.serverId}/backups`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: `auto-backup_${stamp}` }),
+    })
+    if (!res.ok) return 'backup failed'
+    const body = (await res.json().catch(() => null)) as { backup?: { sizeMb?: number } } | null
+    return `backup created${body?.backup?.sizeMb ? ` (${body.backup.sizeMb} MB)` : ''}`
+  }
+
+  private reportScheduleRun(id: string, at: number, result: string) {
+    fetch(`${NEXT_URL}/api/schedules/${id}/ran`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ at, result }),
+    }).catch(() => {}) // panel down → run result just isn't recorded
   }
 }

@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 const patchSchema = z.object({
   name: z.string().trim().min(1).max(64).refine((v) => !v.includes('/'), 'Invalid name').optional(),
   content: z.string().max(200_000).optional(),
+  parentId: z.string().nullable().optional(), // move to another folder
 })
 
 type Ctx = { params: Promise<{ id: string }> }
@@ -18,7 +19,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
 
   const parsed = patchSchema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
-  const { name, content } = parsed.data
+  const { name, content, parentId } = parsed.data
 
   if (name && name !== file.name) {
     const exists = await db.fileNode.findFirst({
@@ -27,11 +28,43 @@ export async function PATCH(req: Request, ctx: Ctx) {
     if (exists) return NextResponse.json({ error: `"${name}" already exists here` }, { status: 409 })
   }
 
+  // move (rename-in-path): validate target folder, prevent cycles
+  let moveParentId = file.parentId
+  if (parentId !== undefined) {
+    if (parentId === null) {
+      moveParentId = null
+    } else {
+      const target = await db.fileNode.findUnique({ where: { id: parentId } })
+      if (!target || target.serverId !== file.serverId || !target.isDir) {
+        return NextResponse.json({ error: 'Invalid target folder' }, { status: 400 })
+      }
+      if (target.id === file.id) {
+        return NextResponse.json({ error: 'Cannot move a folder into itself' }, { status: 400 })
+      }
+      // walk up from target — if we reach `file`, it's a descendant → cycle
+      let node: { id: string; parentId: string | null } | null = target
+      while (node) {
+        if (node.id === file.id) return NextResponse.json({ error: 'Cannot move a folder into its own subtree' }, { status: 400 })
+        node = node.parentId
+          ? await db.fileNode.findUnique({ where: { id: node.parentId }, select: { id: true, parentId: true } })
+          : null
+      }
+      const clash = await db.fileNode.findFirst({
+        where: { serverId: file.serverId, parentId, name: name ?? file.name },
+      })
+      if (clash && clash.id !== file.id) {
+        return NextResponse.json({ error: `"${name ?? file.name}" already exists in that folder` }, { status: 409 })
+      }
+      moveParentId = parentId
+    }
+  }
+
   const updated = await db.fileNode.update({
     where: { id },
     data: {
       ...(name ? { name } : {}),
       ...(content !== undefined && !file.isDir ? { content, size: content.length } : {}),
+      ...(parentId !== undefined ? { parentId: moveParentId } : {}),
     },
   })
   return NextResponse.json({ file: updated })

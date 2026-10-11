@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft, Play, Square, RotateCw, Skull, Copy, TerminalSquare, Activity,
-  Users, FolderCog, HardDriveDownload, Settings2,
+  Users, FolderCog, HardDriveDownload, Settings2, Puzzle, CalendarClock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,6 +21,8 @@ import { PlayersTab } from '@/components/panel/tabs/PlayersTab'
 import { FilesTab } from '@/components/panel/tabs/FilesTab'
 import { BackupsTab } from '@/components/panel/tabs/BackupsTab'
 import { SettingsTab } from '@/components/panel/tabs/SettingsTab'
+import { PluginsTab } from '@/components/panel/tabs/PluginsTab'
+import { SchedulesTab } from '@/components/panel/tabs/SchedulesTab'
 
 export function ServerView({ server }: { server: ServerDTO }) {
   const closeServer = useAppStore((s) => s.closeServer)
@@ -137,6 +139,19 @@ export function ServerView({ server }: { server: ServerDTO }) {
               </span>
             )}
           </TabsTrigger>
+          {server.platform !== 'vanilla' && (
+            <TabsTrigger value="plugins" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+              <Puzzle className="h-4 w-4" /> {server.platform === 'fabric' || server.platform === 'forge' ? 'Mods' : 'Plugins'}
+              {server.plugins?.length > 0 && (
+                <span className="ml-0.5 rounded-full bg-emerald-500/20 text-emerald-300 px-1.5 text-[10px] font-mono">
+                  {server.plugins.length}
+                </span>
+              )}
+            </TabsTrigger>
+          )}
+          <TabsTrigger value="schedules" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
+            <CalendarClock className="h-4 w-4" /> Schedules
+          </TabsTrigger>
           <TabsTrigger value="files" className="data-[state=active]:bg-emerald-500/15 data-[state=active]:text-emerald-300 gap-1.5">
             <FolderCog className="h-4 w-4" /> Files
           </TabsTrigger>
@@ -153,6 +168,8 @@ export function ServerView({ server }: { server: ServerDTO }) {
         {tab === 'console' && <ConsoleTab server={server} />}
         {tab === 'stats' && <StatsTab server={server} />}
         {tab === 'players' && <PlayersTab server={server} />}
+        {tab === 'plugins' && <PluginsTab server={server} />}
+        {tab === 'schedules' && <SchedulesTab server={server} />}
         {tab === 'files' && <FilesTab server={server} />}
         {tab === 'backups' && <BackupsTab server={server} />}
         {tab === 'settings' && <SettingsTab server={server} />}

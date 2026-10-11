@@ -9,6 +9,7 @@ const createSchema = z.object({
   name: z.string().trim().min(1).max(64).refine((v) => !v.includes('/'), 'Invalid name'),
   isDir: z.boolean(),
   content: z.string().max(200_000).optional(),
+  size: z.number().int().min(0).max(500_000_000).optional(), // byte size for binary uploads
 })
 
 type Ctx = { params: Promise<{ id: string }> }
@@ -33,7 +34,7 @@ export async function POST(req: Request, ctx: Ctx) {
 
   const parsed = createSchema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid file', details: parsed.error.flatten() }, { status: 400 })
-  const { parentId, name, isDir, content } = parsed.data
+  const { parentId, name, isDir, content, size } = parsed.data
 
   if (parentId) {
     const parent = await db.fileNode.findUnique({ where: { id: parentId } })
@@ -51,8 +52,8 @@ export async function POST(req: Request, ctx: Ctx) {
       parentId: parentId ?? null,
       name,
       isDir,
-      content: isDir ? null : (content ?? ''),
-      size: isDir ? 0 : (content?.length ?? 0),
+      content: isDir ? null : (content ?? null),
+      size: isDir ? 0 : (size ?? content?.length ?? 0),
     },
   })
   return NextResponse.json({ file }, { status: 201 })

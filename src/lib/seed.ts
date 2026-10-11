@@ -1,6 +1,6 @@
 // Server-side helpers: seed file trees, players, and generate server.properties
 import { db } from '@/lib/db'
-import { NAME_POOL } from '@/lib/mc'
+import { NAME_POOL, PLUGIN_CATALOG } from '@/lib/mc'
 
 function pad(n: number): string {
   return n.toString().padStart(2, '0')
@@ -206,4 +206,47 @@ export async function pickPort(): Promise<number> {
     if (!used.has(p)) return p
   }
   return 25610
+}
+
+// ─── Installed add-ons ────────────────────────────────────────────────────────
+
+/** Display names of plugins/mods installed on a server, derived from the real
+ *  file tree (jars inside plugins/ or mods/). Used for ServerDTO.plugins and
+ *  the engine's /plugins console command. */
+export async function serverPluginNames(serverId: string): Promise<string[]> {
+  const dirs = await db.fileNode.findMany({
+    where: { serverId, isDir: true, name: { in: ['plugins', 'mods'] } },
+    select: { id: true },
+  })
+  if (!dirs.length) return []
+  const jars = await db.fileNode.findMany({
+    where: { serverId, isDir: false, parentId: { in: dirs.map((d) => d.id) }, name: { endsWith: '.jar' } },
+    select: { name: true },
+    orderBy: { name: 'asc' },
+  })
+  const display = (jar: string) => {
+    const item = PLUGIN_CATALOG.find((p) => jar.startsWith(p.jarPrefix))
+    if (item) return item.name
+    return jar.replace(/-[\d.]+[+-]?.*\.jar$/, '')
+  }
+  return jars.map((j) => display(j.name))
+}
+
+/** Shared backup creator (used by the backups API, plugin-triggered backups and
+ *  scheduled tasks). Returns the created Backup row. */
+export async function createBackupFor(server: { id: string; name: string; ramMb: number }, customName?: string) {
+  const d = new Date()
+  const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`
+  const name = customName?.trim() ? customName.trim().slice(0, 60) : `world-backup_${stamp}`
+  const sizeMb = Math.round((40 + Math.random() * 90) * (server.ramMb / 4096) * 10) / 10
+  const backup = await db.backup.create({ data: { serverId: server.id, name, sizeMb } })
+  await db.activity.create({
+    data: {
+      type: 'backup',
+      message: `Backup "${name}" created (${sizeMb} MB) for "${server.name}"`,
+      serverId: server.id,
+      serverName: server.name,
+    },
+  })
+  return backup
 }

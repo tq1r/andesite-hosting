@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { getEngineStatuses, FALLBACK_STATUS } from '@/lib/engine'
-import { genProperties, seedFileTree, seedPlayers, pickPort } from '@/lib/seed'
+import { genProperties, seedFileTree, seedPlayers, pickPort, serverPluginNames } from '@/lib/seed'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,13 +28,17 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
   })
   const statuses = await getEngineStatuses()
+  const pluginsByServer = await Promise.all(
+    servers.map((s) => serverPluginNames(s.id))
+  )
   return NextResponse.json({
-    servers: servers.map((s) => {
+    servers: servers.map((s, i) => {
       const st = statuses[s.id] ?? FALLBACK_STATUS
       return {
         ...s,
         playerCount: s._count.players,
         backupCount: s._count.backups,
+        plugins: pluginsByServer[i],
         status: st.status,
         playersOnline: st.playersOnline,
         uptimeSec: st.uptimeSec,

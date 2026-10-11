@@ -51,6 +51,7 @@ export interface ServerDTO {
   updatedAt: string
   playerCount: number
   backupCount: number
+  plugins: string[]
   status: ServerStatus
   playersOnline: number
   uptimeSec: number
@@ -83,6 +84,19 @@ export interface BackupDTO {
   id: string
   name: string
   sizeMb: number
+  createdAt: string
+}
+
+export interface ScheduleDTO {
+  id: string
+  serverId: string
+  name: string
+  everyMin: number
+  action: 'backup' | 'restart' | 'command'
+  payload: string | null
+  enabled: boolean
+  lastRunAt: string | null
+  lastResult: string | null
   createdAt: string
 }
 
@@ -303,6 +317,76 @@ export const SERVER_NAME_IDEAS = [
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+// One-click installable add-ons. jarPrefix matches the jar FileNode name in
+// plugins/ or mods/ — installed state is derived from the real file tree.
+export interface PluginCatalogItem {
+  id: string
+  name: string
+  author: string
+  category: 'Utility' | 'Admin' | 'Performance' | 'Protection' | 'Gameplay' | 'Library' | 'Social' | 'World' | 'Fun'
+  platforms: string[] // paper | spigot | fabric | forge
+  jarPrefix: string
+  version: string
+  sizeKb: number
+  downloads: string
+  desc: string
+}
+
+export const PLUGIN_CATALOG: PluginCatalogItem[] = [
+  // ── Bukkit ecosystem (Paper / Spigot) ──
+  { id: 'essentialsx', name: 'EssentialsX', author: 'EssentialsX Team', category: 'Utility', platforms: ['paper', 'spigot'], jarPrefix: 'EssentialsX-', version: '2.21.0', sizeKb: 2153, downloads: '62.4M', desc: 'The essential kit: homes, warps, kits, teleporting and 100+ commands every survival server needs.' },
+  { id: 'luckperms', name: 'LuckPerms', author: 'Luck', category: 'Admin', platforms: ['paper', 'spigot', 'fabric', 'forge'], jarPrefix: 'LuckPerms-', version: '5.5.5', sizeKb: 10529, downloads: '41.2M', desc: 'Advanced, highly configurable permissions manager with web editor and group inheritance.' },
+  { id: 'worldedit', name: 'WorldEdit', author: 'EngineHub', category: 'Utility', platforms: ['paper', 'spigot'], jarPrefix: 'WorldEdit-', version: '7.4.0', sizeKb: 2512, downloads: '55.8M', desc: 'In-game map editor — sculpt terrain, copy/paste structures and fix grief in seconds.' },
+  { id: 'vault', name: 'Vault', author: 'sleaker', category: 'Library', platforms: ['paper', 'spigot'], jarPrefix: 'Vault-', version: '1.8.1', sizeKb: 428, downloads: '38.9M', desc: 'The bridge between plugins — economy, permissions and chat hooks every network relies on.' },
+  { id: 'placeholderapi', name: 'PlaceholderAPI', author: 'HelpChat', category: 'Library', platforms: ['paper', 'spigot'], jarPrefix: 'PlaceholderAPI-', version: '2.11.6', sizeKb: 610, downloads: '30.1M', desc: 'Thousands of placeholders (%player_name%, %server_tps%…) for scoreboards, TAB and chat.' },
+  { id: 'coreprotect', name: 'CoreProtect', author: 'Intelli', category: 'Admin', platforms: ['paper', 'spigot'], jarPrefix: 'CoreProtect-', version: '22.4.0', sizeKb: 2048, downloads: '12.7M', desc: 'Block-logging and rollback — find out exactly who griefed what, and undo it.' },
+  { id: 'griefprevention', name: 'GriefPrevention', author: 'TechFortress', category: 'Protection', platforms: ['paper', 'spigot'], jarPrefix: 'GriefPrevention-', version: '16.18.2', sizeKb: 1229, downloads: '8.9M', desc: 'Self-serve land claims with a golden shovel. Zero-config anti-grief for survival servers.' },
+  { id: 'worldguard', name: 'WorldGuard', author: 'EngineHub', category: 'Protection', platforms: ['paper', 'spigot'], jarPrefix: 'WorldGuard-', version: '7.0.12', sizeKb: 2210, downloads: '33.7M', desc: 'Region protection, flags and spawn safety — the industry standard since 2010.' },
+  { id: 'multiverse', name: 'Multiverse-Core', author: 'Multiverse Team', category: 'World', platforms: ['paper', 'spigot'], jarPrefix: 'Multiverse-Core-', version: '4.3.12', sizeKb: 918, downloads: '14.6M', desc: 'Multiple worlds with per-world rules: creative world, mining world, event worlds and more.' },
+  { id: 'viaversion', name: 'ViaVersion', author: 'ViaVersion', category: 'Utility', platforms: ['paper', 'spigot'], jarPrefix: 'ViaVersion-', version: '5.4.2', sizeKb: 1460, downloads: '28.3M', desc: 'Let friends on newer client versions join your server — no downgrade needed.' },
+  { id: 'protocollib', name: 'ProtocolLib', author: 'dmulloy2', category: 'Library', platforms: ['paper', 'spigot'], jarPrefix: 'ProtocolLib-', version: '5.3.0', sizeKb: 890, downloads: '24.9M', desc: 'Low-level packet library that powers half the plugin ecosystem.' },
+  { id: 'tab', name: 'TAB', author: 'NEZNAMY', category: 'Fun', platforms: ['paper', 'spigot'], jarPrefix: 'TAB-', version: '5.2.1', sizeKb: 2400, downloads: '6.8M', desc: 'Custom tab list, nametags, bossbar and scoreboard with placeholders and animations.' },
+  { id: 'discordsrv', name: 'DiscordSRV', author: 'Scarsz', category: 'Social', platforms: ['paper', 'spigot'], jarPrefix: 'DiscordSRV-', version: '1.29.0', sizeKb: 3200, downloads: '5.4M', desc: 'Link Minecraft chat to a Discord channel — cross-platform chat, joins and deaths.' },
+  { id: 'spark', name: 'spark', author: 'lucko', category: 'Performance', platforms: ['paper', 'spigot', 'fabric', 'forge'], jarPrefix: 'spark-', version: '1.10.98', sizeKb: 2800, downloads: '15.5M', desc: 'The profiler — find exactly what eats your TPS with CPU sampling and heap reports.' },
+  // ── Fabric / NeoForge ecosystem ──
+  { id: 'fabric-api', name: 'Fabric API', author: 'modmuss50', category: 'Library', platforms: ['fabric'], jarPrefix: 'fabric-api-', version: '0.131.2', sizeKb: 2256, downloads: '48.9M', desc: 'The essential hooks every Fabric mod builds on. Install this first.' },
+  { id: 'lithium', name: 'Lithium', author: 'CaffeineMC', category: 'Performance', platforms: ['fabric', 'forge'], jarPrefix: 'lithium-', version: '0.16.2', sizeKb: 490, downloads: '21.3M', desc: 'Server-side optimization of physics, mob AI and ticking — free TPS, zero behavior change.' },
+  { id: 'krypton', name: 'Krypton', author: 'CaffeineMC', category: 'Performance', platforms: ['fabric'], jarPrefix: 'krypton-', version: '0.3.2', sizeKb: 310, downloads: '8.1M', desc: 'Optimizes the network stack and packet pipeline for high-player-count servers.' },
+  { id: 'carpet', name: 'Carpet', author: 'gnembon', category: 'Utility', platforms: ['fabric'], jarPrefix: 'fabric-carpet-', version: '1.4.180', sizeKb: 850, downloads: '11.2M', desc: 'Technical survival tweaks and fake players (/player bot) for farms and testing.' },
+  { id: 'jei', name: 'Just Enough Items (JEI)', author: 'mezz', category: 'Utility', platforms: ['forge', 'fabric'], jarPrefix: 'jei-', version: '19.8.2', sizeKb: 1285, downloads: '310M', desc: 'Recipe and item browser — the modpack classic. Works server-side for recipes.' },
+  { id: 'create', name: 'Create', author: 'simibubi', category: 'Gameplay', platforms: ['forge'], jarPrefix: 'create-', version: '7.0.2', sizeKb: 24313, downloads: '95.4M', desc: 'Rotational contraptions, trains, factories — the definitive engineering mod.' },
+  { id: 'arsnouveau', name: 'Ars Nouveau', author: 'baileyholl', category: 'Gameplay', platforms: ['forge'], jarPrefix: 'ars_nouveau-', version: '5.4.0', sizeKb: 15600, downloads: '18.6M', desc: 'Build your own spells, familiars and magical automation.' },
+  { id: 'jade', name: 'Jade', author: 'Snownee', category: 'Utility', platforms: ['forge', 'fabric'], jarPrefix: 'Jade-', version: '15.10.0', sizeKb: 690, downloads: '44.2M', desc: 'Shows what you are looking at — block info, progress, and mob stats on hover.' },
+]
+
+export const PLUGIN_CATEGORIES = ['All', 'Utility', 'Admin', 'Performance', 'Protection', 'Gameplay', 'Library', 'Social', 'World', 'Fun'] as const
+
+export function pluginsForPlatform(platform: string): PluginCatalogItem[] {
+  return PLUGIN_CATALOG.filter((p) => p.platforms.includes(platform))
+}
+
+export function cadenceLabel(min: number): string {
+  if (min < 60) return `Every ${min} min`
+  if (min < 1440) {
+    const h = min / 60
+    return h === 1 ? 'Every hour' : `Every ${h} hours`
+  }
+  if (min < 10080) {
+    const d = min / 1440
+    return d === 1 ? 'Every day' : `Every ${d} days`
+  }
+  const w = min / 10080
+  return w === 1 ? 'Every week' : `Every ${w} weeks`
+}
+
+export const CADENCE_OPTIONS = [
+  { min: 60, label: 'Every hour' },
+  { min: 360, label: 'Every 6 hours' },
+  { min: 720, label: 'Every 12 hours' },
+  { min: 1440, label: 'Every day' },
+  { min: 10080, label: 'Every week' },
+]
 
 export function ramLabel(mb: number): string {
   return mb >= 1024 ? `${(mb / 1024).toFixed(mb % 1024 === 0 ? 0 : 1)} GB` : `${mb} MB`

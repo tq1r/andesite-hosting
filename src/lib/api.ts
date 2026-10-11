@@ -30,6 +30,7 @@ export interface EngineConfig {
   port: number
   gamemode: string
   difficulty: string
+  plugins?: string[]
 }
 
 export function toEngineConfig(s: ServerDTO): EngineConfig {
@@ -44,6 +45,7 @@ export function toEngineConfig(s: ServerDTO): EngineConfig {
     port: s.port,
     gamemode: s.gamemode,
     difficulty: s.difficulty,
+    plugins: s.plugins,
   }
 }
 
